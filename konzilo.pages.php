@@ -32,7 +32,7 @@ function konzilo_auth_settings() {
   try {
     if (konzilo_get_token($url, $client_id, $client_key,
                                 $redirect_uri, $state, true)) {
-      $message = _("Authorization complete", 'konzilo');
+      $message = __('Authorization complete', 'konzilo');
     }
   }
   catch(Exception $e) {
@@ -45,7 +45,6 @@ function konzilo_auth_settings() {
     'error' => !empty($error) ? $error : false,
     'message' => !empty($message) ? $message : false,
   );
-
   if (isset($_GET['client_id']) && isset($_GET['client_secret']) && empty($_GET['settings-updated'])) {
     $args['client_id'] = $_GET['client_id'];
     $args['client_key'] = $_GET['client_secret'];

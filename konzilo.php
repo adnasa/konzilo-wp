@@ -48,9 +48,9 @@ add_action ( 'init', 'konzilo_add_textdomain', 11 );
  * Verify that we have a valid client.
  */
 function konzilo_has_client() {
-  $client_id = get_site_option('konzilo_client_id', '');
-  $client_key = get_site_option('konzilo_client_key', '');
-  $token = get_site_option('konzilo_access_token', '');
+  $client_id = get_option('konzilo_client_id', '');
+  $client_key = get_option('konzilo_client_key', '');
+  $token = get_option('konzilo_access_token', '');
   return $client_id && $client_key && $token;
 }
 
@@ -70,6 +70,43 @@ function konzilo_get_auth_headers() {
     'Content-Type' => 'application/json'
   );
 }
+
+/**
+ * Get a token for a particular client.
+ */
+function konzilo_get_token($url, $client_id, $client_secret, $redirect_uri, $state, $local = false) {
+  if (!isset($_GET['code']) || !isset($_GET['state'])) {
+    return false;
+  }
+  if ($state != $_GET['state']) {
+    var_dump('oops');
+    throw new Exception('Invalid state');
+  }
+  $oauth_url = $url . '/oauth2/token/';
+  $args = array(
+    'body' => array(
+      'grant_type' => 'authorization_code',
+      'code' => $_GET['code'],
+      'redirect_uri' => $redirect_uri,
+    ),
+    'headers' => array(
+      'Authorization' => 'Basic ' .
+      base64_encode($client_id . ':' . $client_secret)
+    ),
+  );
+  $result = wp_remote_post($oauth_url, $args);
+  if ($result['response']['code'] > 399) {
+    throw new Exception("Authorization failed");
+  }
+  $codes = json_decode($result['body']);
+  $update = $local ? 'update_option' : 'update_site_option';
+
+  $update('konzilo_refresh_token', $codes->refresh_token);
+  $update('konzilo_access_token', $codes->access_token);
+  $update('konzilo_token_expires', time() + $codes->expires_in);
+  return true;
+}
+
 
 /**
  * Get a refresh token. If the current token is expired,
@@ -116,7 +153,10 @@ function konzilo_get_data($resource, $args = array(), $id = NULL, $params = arra
       $uri .= '/' . $id;
   }
   // Allow other plugins to hook in.
-  $params = apply_filters('konzilo_request_params', $resource, $params);
+  $new_params = apply_filters('konzilo_request_params', $resource, $params);
+  if (is_array($new_params)) {
+    $params = $new_params;
+  }
   if (!empty($params)) {
     $uri .= '?';
     $parts = array();
@@ -208,9 +248,9 @@ function konzilo_meta_box_setup() {
     wp_localize_script('social', 'SocialTranslations', konzilo_box_t());
     wp_enqueue_script('social');
     wp_enqueue_style('social', plugins_url( 'fonts/css/fontello-embedded.css', __FILE__ ));
+    add_action('add_meta_boxes', 'konzilo_add_meta_boxes');
+    add_action('save_post', 'konzilo_save_meta', 10, 2 );
   }
-  add_action('add_meta_boxes', 'konzilo_add_meta_boxes');
-  add_action('save_post', 'konzilo_save_meta', 10, 2 );
 }
 
 function konzilo_create_none_settings($action, $name) {
