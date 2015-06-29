@@ -1,0 +1,125 @@
+# Copyright (C) 2015 konzilo_social
+# This file is distributed under the same license as the konzilo_social package.
+msgid ""
+msgstr ""
+"Project-Id-Version: konzilo_social\n"
+"Report-Msgid-Bugs-To: http://kntnt.com\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2015-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Fabian Sörqvist <fabian@kntnt.com>\n"
+"Language-Team: Kntnt <info@kntnt.com>\n"
+
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+#: web/app/plugins/konzilo_social/konzilo_social.php:387, web/app/plugins/konzilo_social/konzilo_social.php:388
+msgid "Social publishing"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:506
+msgid "Queue"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:507
+msgid "Days"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:508
+msgid "Monday"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:509
+msgid "Tuesday"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:510
+msgid "Wednesday"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:511
+msgid "Thursday"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:512
+msgid "Friday"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:513
+msgid "Saturday"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:514
+msgid "Sunday"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:515
+msgid "Posting times"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:516
+msgid "Remove"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:517
+msgid "Add posting time"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:518
+msgid "Save queue"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:519
+msgid "Create new queue"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:520
+msgid "Create queue"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:522
+msgid "Default settings for social media"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:523
+msgid "Save defaults"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:524
+msgid "Queue settings"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:525
+msgid "All days"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:531
+msgid "Add profile"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:532
+msgid "You can use the following shortcodes:"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:533
+msgid "Publish now"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:534
+msgid "First in queue"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:535
+msgid "Last in queue"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:536
+msgid "Scheduled at:"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:537
+msgid "Add another update"
+msgstr ""
+
+#: web/app/plugins/konzilo_social/konzilo_social.php:538
+msgid "Sent at:"
+msgstr ""

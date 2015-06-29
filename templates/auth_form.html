@@ -1,0 +1,43 @@
+<div class="wrap">
+    <h2>{{'Konzilo settings' | t }}</h2>
+    {% if from_konzilo %}
+    <div class="updated settings-error">
+        <p>{{'The client id and key has been filled in from konzilo. Click save to if everything looks ok!' | t}}</p>
+    </div>
+    {% endif %}
+    {% if message %}
+    <div class="updated settings-error">
+        <p>{{message}}</p>
+    </div>
+    {% endif %}
+    {% if error %}
+    <div class="error">
+        <p>{{error}}</p>
+    </div>
+    {% endif %}
+    <form method="post" action="options.php">
+      {{ settings_fields('konzilo_auth_settings') }}
+      {{ do_settings_sections('konzilo_auth_settings') }}
+      <table class="form-table">
+	  <tr valign="top">
+              <tr valign="top">
+	          <th scop="row">{{'Client id' | t}}</th>
+	          <td><input name="konzilocustom_client_id" type="text" value="{{client_id}}" /></td>
+	      </tr>
+	      <tr valign="top">
+	          <th scop="row">{{'Client key' | t }}</th>
+	          <td><input name="konzilocustom_client_key" type="text" value="{{client_key}}" /></td>
+	      </tr>
+          </tr>
+      </table>
+      {{ submit_button() }}
+    </form>
+    {% if link %}
+    {% if not authorized %}
+    <p>{{'You need to authorize this site in order to use the konzilo services.' | t}}</p>
+    {% else %}
+    <p>{{ 'Click authorize if you are having problems with the konzilo service.' | t }}</p>
+    {% endif %}
+    <a href="{{ link }}" class="button">{{'Authorize' | t}}</a>
+    {% endif %}
+</div>
