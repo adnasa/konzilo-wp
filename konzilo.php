@@ -8,6 +8,17 @@
  * Version: 0.1
  */
 
+// we look for Composer files first in the plugins dir
+// then in the wp-content dir (site install)
+// and finally in the current themes directories
+if (   file_exists( $composer_autoload = __DIR__ . '/vendor/autoload.php' ) /* check in self */
+       || file_exists( $composer_autoload = WP_CONTENT_DIR.'/vendor/autoload.php') /* check in wp-content */
+       || file_exists( $composer_autoload = get_stylesheet_directory().'/vendor/autoload.php') /* check in child theme */
+       || file_exists( $composer_autoload = get_template_directory().'/vendor/autoload.php') /* check in parent theme */
+) {
+  require_once $composer_autoload;
+}
+
 // Default konzilo location.
 if (!defined('KONZILO_URL')) {
   define('KONZILO_URL', 'http://localhost:8000');
