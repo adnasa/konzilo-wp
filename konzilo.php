@@ -248,7 +248,8 @@ function konzilo_meta_box_setup() {
     ));
     wp_localize_script('social', 'SocialTranslations', konzilo_box_t());
     wp_enqueue_script('social');
-    wp_enqueue_style('social', plugins_url( 'fonts/css/fontello-embedded.css', __FILE__ ));
+    wp_enqueue_style('social', plugins_url('css/social.css', __FILE__));
+    wp_enqueue_style('social-fonts', plugins_url( 'fonts/css/fontello-embedded.css', __FILE__ ));
     add_action('add_meta_boxes', 'konzilo_add_meta_boxes');
     add_action('save_post', 'konzilo_save_meta', 10, 2 );
   }
