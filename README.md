@@ -1,4 +1,4 @@
-# Wordpress integration for wordpress
+# Wordpress integration for Konzilo
 
 This plugin allows you to connect your wordpress installation to wordpress.
 
