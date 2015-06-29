@@ -1,0 +1,12 @@
+{
+    "name": "konzilo/konzilo-wp",
+    "require": {
+        "twig/twig": "^1.18"
+    },
+    "authors": [
+        {
+            "name": "Fabian Sorqvist",
+            "email": "fabian@sorqvist.nu"
+        }
+    ]
+}
