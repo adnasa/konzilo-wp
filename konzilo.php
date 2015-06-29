@@ -48,9 +48,10 @@ add_action ( 'init', 'konzilo_add_textdomain', 11 );
  * Verify that we have a valid client.
  */
 function konzilo_has_client() {
-  $client_id = get_option('konzilo_client_id', '');
-  $client_key = get_option('konzilo_client_key', '');
-  $token = get_option('konzilo_access_token', '');
+  $get = is_multisite() ? 'get_site_option' : 'get_option';
+  $client_id = $get('konzilo_client_id', '');
+  $client_key = $get('konzilo_client_key', '');
+  $token = $get('konzilo_access_token', '');
   return $client_id && $client_key && $token;
 }
 
