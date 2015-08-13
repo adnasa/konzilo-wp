@@ -80,7 +80,6 @@ function konzilo_get_token($url, $client_id, $client_secret, $redirect_uri, $sta
     return false;
   }
   if ($state != $_GET['state']) {
-    var_dump('oops');
     throw new Exception('Invalid state');
   }
   $oauth_url = $url . '/oauth2/token/';
@@ -129,6 +128,7 @@ function konzilo_refresh_token() {
   );
   $result = wp_remote_post($url . '/oauth2/token/', $args);
   if (is_object($result)) {
+
     throw new Exception($result->get_error_message());
   }
   if (is_object($result) || $result['response']['code'] > 399) {
@@ -239,19 +239,23 @@ add_action('load-post-new.php', 'konzilo_meta_box_setup');
 
 function konzilo_meta_box_setup() {
   if (konzilo_has_client()) {
-    $profiles = konzilo_get_profiles();
-    $konziloSocialNonce = konzilo_create_none_settings( basename( __FILE__ ), 'konzilo_nonce');
-    wp_register_script('social', plugins_url( 'dist/social.js', __FILE__ ), array('jquery', 'underscore'));
-    wp_localize_script('social', 'SocialSettings', array(
-      'profiles' => $profiles,
-      'konziloSocialNonce' => $konziloSocialNonce,
-    ));
-    wp_localize_script('social', 'SocialTranslations', konzilo_box_t());
-    wp_enqueue_script('social');
-    wp_enqueue_style('social', plugins_url('css/social.css', __FILE__));
-    wp_enqueue_style('social-fonts', plugins_url( 'fonts/css/fontello-embedded.css', __FILE__ ));
-    add_action('add_meta_boxes', 'konzilo_add_meta_boxes');
-    add_action('save_post', 'konzilo_save_meta', 10, 2 );
+    try {
+      $profiles = konzilo_get_profiles();
+      $konziloSocialNonce = konzilo_create_none_settings( basename( __FILE__ ), 'konzilo_nonce');
+      wp_register_script('social', plugins_url( 'dist/social.js', __FILE__ ), array('jquery', 'underscore'));
+      wp_localize_script('social', 'SocialSettings', array(
+        'profiles' => $profiles,
+        'konziloSocialNonce' => $konziloSocialNonce,
+      ));
+      wp_localize_script('social', 'SocialTranslations', konzilo_box_t());
+      wp_enqueue_script('social');
+      wp_enqueue_style('social', plugins_url('css/social.css', __FILE__));
+      wp_enqueue_style('social-fonts', plugins_url( 'fonts/css/fontello-embedded.css', __FILE__ ));
+      add_action('add_meta_boxes', 'konzilo_add_meta_boxes');
+      add_action('save_post', 'konzilo_save_meta', 10, 2 );
+    } catch(Exception $e) {
+      // Notify the user somehow...
+    }
   }
 }
 
@@ -695,6 +699,21 @@ function konzilo_settings() {
   echo '<div class="wrap"><div id="konzilo-social-queue"></div></div>';
 
 }
+
+function konzilo_before_delete($post_id) {
+  $konzilo_id = get_post_meta($post_id, 'konzilo_id', true);
+  if (empty($konzilo_id)) {
+    return;
+  }
+  try {
+    konzilo_delete_data('updates', $konzilo_id);
+  }
+  catch(Exception $e) {
+    //...
+  }
+}
+
+add_action('before_delete_post', 'konzilo_before_delete');
 
 function konzilo_queue_t() {
   return array(
