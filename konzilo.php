@@ -215,10 +215,16 @@ function konzilo_get_profiles() {
   return $profiles;
 }
 
-function konzilo_get_updates($post_id) {
+function konzilo_get_update($id) {
+  return konzilo_get_data('updates', array(), $id);
+}
+
+function konzilo_get_updates($post_id, $cache = true) {
   static $updates = array();
-  if (empty($updates)) {
-    $updates = wp_cache_get('konzilo_updates_' . $post_id);
+  if (empty($updates) && $cache) {
+    if ($cache) {
+      $updates = wp_cache_get('konzilo_updates_' . $post_id);
+    }
     if (empty($updates)) {
       $args = array('post_id' => $post_id);
       if (is_multisite()) {
@@ -713,8 +719,59 @@ function konzilo_before_delete($post_id) {
     //...
   }
 }
-
 add_action('before_delete_post', 'konzilo_before_delete');
+
+function konzilo_submitbox() {
+  $post = get_post();
+  $konzilo_id = get_post_meta($post->ID, 'konzilo_id', true);
+  $konzilo_info = konzilo_get_data('updates', array(), $konzilo_id);
+  if (!empty($konzilo_info)) {
+    $status_label = '';
+    switch ($konzilo_info->type) {
+      case 'stored':
+        $status_label = __('Parked in konzilo', 'konzilo');
+        break;
+    }
+  }
+}
+//add_action('post_submitbox_misc_actions', 'konzilo_submitbox');
+
+
+function konzilo_transition($new_status, $old_status, $post) {
+  if ($new_status == $old_status) {
+    return;
+  }
+  $konzilo_id = get_post_meta($post->ID, 'konzilo_id', true);
+  if (empty($konzilo_id)) {
+    return;
+  }
+  try {
+    $data = konzilo_get_update($konzilo_id);
+    $data->status = $new_status;
+    if ($new_status == 'published') {
+      $data->type = 'now';
+    }
+    konzilo_put_data('updates', $konzilo_id, array('body' => $data));
+  }
+  catch(Exception $e) {
+    //...
+  }
+}
+add_action('transition_post_status', 'konzilo_transition', 10, 3);
+
+
+function konzilo_post_status() {
+
+  $args = array(
+    'label'                     => _x( 'done', 'Status General Name', 'konzilo' ),
+    'label_count'               => _n_noop( 'done (%s)',  'done (%s)', 'konzilo' ),
+    'public'                    => false,
+    'exclude_from_search'       => true,
+  );
+  register_post_status( 'done', $args );
+
+}
+add_action( 'init', 'konzilo_post_status', 0 );
 
 function konzilo_queue_t() {
   return array(
