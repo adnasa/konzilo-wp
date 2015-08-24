@@ -1,5 +1,5 @@
 <div class="misc-pub-section misc-pub-post-status">
-  <label for="post_status">{{'Publishing:' | t }}</label>
+  <label for="konzilo-status">{{'Publishing:' | t }}</label>
   <span id="konzilo-post-status">
     {{konzilo_status}}
   </span>
@@ -10,31 +10,33 @@
       {{'Edit status' | t }}
     </span>
   </a>
-  <div id="konzilo-status-select">
+  <div id="konzilo-status-select" class="hide-if-js">
     <label><input type="radio" name="konzilo_type"
                   value="stored" {{checked(post, 'stored')}} />
       <span>{{'Park' | t}}</span>
     </label>
 
     <label>
-      <input type="radio" name="queue_items" value="queue" {{checked(post, 'queue_last')}} />
+      <input type="radio" name="queue_items" value="queue" {{checked(post, ['queue_last', 'queue_first'])}} />
       <span>{{'Publish list' | t}}</span>
     </label>
-    <select name="konzilo_queue">
-      {% for queue in queues%}
-      <option value="{{queue.id}}">{{queue.name}}</option>
-      {% endfor %}
-    </select>
-    <label>
-      <input type="radio" name="konzilo_type"
-                  value="queue_last" {{checked(post, 'queue_last')}} />
-      <span>{{'Put last in queue' | t}}</span>
-    </label>
-    <label>
-      <input type="radio" name="konzilo_type"
-                  value="queue_first" {{checked(post, 'queue_first')}} />
-      <span>{{'Put first in queue' | t}}</span>
-    </label>
+    <div class="queue-settings">
+      <select name="konzilo_queue">
+        {% for queue in queues%}
+        <option value="{{queue.id}}">{{queue.name}}</option>
+        {% endfor %}
+      </select>
+      <label>
+        <input type="radio" name="konzilo_type"
+               value="queue_last" {{checked(post, 'queue_last')}} />
+        <span>{{'Put last in queue' | t}}</span>
+      </label>
+      <label>
+        <input type="radio" name="konzilo_type"
+               value="queue_first" {{checked(post, 'queue_first')}} />
+        <span>{{'Put first in queue' | t}}</span>
+      </label>
+    </div>
     <label>
       <input type="radio" name="konzilo_type" value="now" {{checked(post, 'now')}} />
       <span>{{'Publish now' | t}}</span>

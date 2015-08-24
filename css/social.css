@@ -185,3 +185,47 @@ a.remove-box {
     color: #60ad5f;
     font-weight: bold;
 }
+
+#konzilo-post-status {
+    font-weight: 600;
+}
+
+#konzilo-status-select {
+    line-height: 1.5em;
+    margin-top: 3px;
+    padding-left: 20px;
+}
+
+#konzilo-status-select label {
+    display: block;
+}
+
+#konzilo-status-select .queue-settings {
+    margin-left: 40px;
+    margin-top: 10px;
+}
+
+#konzilo-status-select .queue-settings label {
+    padding: 7px 0;
+}    
+
+label[for=konzilo-status] {
+    
+}
+
+label[for=konzilo-status]:before {
+    font: normal 20px/1 'dashicons';
+    speak: none;
+    display: inline-block;
+    padding: 0 5px 0 0;
+    top: 0;
+    left: -1px;
+    position: relative;
+    vertical-align: top;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-decoration: none !important;
+    content: '\f145';
+    top: -1px;
+    color: #82878c;
+}

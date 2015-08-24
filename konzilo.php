@@ -81,7 +81,6 @@ function konzilo_get_token($url, $client_id, $client_secret, $redirect_uri, $sta
     return false;
   }
   if ($state != $_GET['state']) {
-    var_dump('oops');
     throw new Exception('Invalid state');
   }
   $oauth_url = $url . '/oauth2/token/';
@@ -130,6 +129,7 @@ function konzilo_refresh_token() {
   );
   $result = wp_remote_post($url . '/oauth2/token/', $args);
   if (is_object($result)) {
+
     throw new Exception($result->get_error_message());
   }
   if (is_object($result) || $result['response']['code'] > 399) {
@@ -216,10 +216,16 @@ function konzilo_get_profiles() {
   return $profiles;
 }
 
-function konzilo_get_updates($post_id) {
+function konzilo_get_update($id) {
+  return konzilo_get_data('updates', array(), $id);
+}
+
+function konzilo_get_updates($post_id, $cache = true) {
   static $updates = array();
-  if (empty($updates)) {
-    $updates = wp_cache_get('konzilo_updates_' . $post_id);
+  if (empty($updates) && $cache) {
+    if ($cache) {
+      $updates = wp_cache_get('konzilo_updates_' . $post_id);
+    }
     if (empty($updates)) {
       $args = array('post_id' => $post_id);
       if (is_multisite()) {
@@ -240,6 +246,8 @@ add_action('load-post-new.php', 'konzilo_meta_box_setup');
 
 function konzilo_meta_box_setup() {
   if (konzilo_has_client()) {
+    try {
+
     $profiles = konzilo_get_profiles();
     $konziloSocialNonce = konzilo_create_none_settings( basename( __FILE__ ), 'konzilo_nonce');
     wp_register_script('social', plugins_url( 'dist/social.js', __FILE__ ), array('jquery', 'underscore'));
@@ -254,13 +262,17 @@ function konzilo_meta_box_setup() {
     add_action('add_meta_boxes', 'konzilo_add_meta_boxes');
     add_action('save_post', 'konzilo_save_meta', 10, 2 );
     add_action('save_post', 'konzilo_save_update', 10, 2 );
+    }
+    catch(Exception $e) {
+      // Notify the user somehow...
+    }
   }
 }
 
 function konzilo_save_update($post_id, $post ) {
   $post_type = get_post_type_object( $post->post_type );
   /* Check if the current user has permission to edit the post.*/
-  if ( !current_user_can( $post_type->cap->edit_post, $post_id ) )
+  if ( !current_user_can( $post_type->cap->edit_post, $post_id ) || !isset($_POST['konzilo_type']))
     return $post_id;
   $konzilo_id = get_post_meta( $post->ID, 'konzilo_id', true );
   if (!empty($konzilo_id)) {
@@ -282,7 +294,7 @@ function konzilo_save_update($post_id, $post ) {
     $update->status = 'done';
   }
   if (!empty($update->id)) {
-    konzilo_put_data('updates', $update->id, array(
+    $result = konzilo_put_data('updates', $update->id, array(
       'body' => $update));
   }
   else {
@@ -743,7 +755,9 @@ class KonziloTwigExtension extends Twig_Extension {
     return array(
       new Twig_SimpleFunction('checked', function ($values, $type) {
         $values = (object)$values;
-        if ($values->type == $type) {
+
+        if ((is_array($type) && in_array($values->type, $type)) ||
+             $values->type == $type) {
           return 'checked';
         }
       })
@@ -752,13 +766,42 @@ class KonziloTwigExtension extends Twig_Extension {
 }
 
 function konzilo_submit_actions() {
+  global $post;
   $queues = konzilo_get_queues();
-  $konzilo_status = __('Last in publishing list', 'konzilo');
+  $konzilo_id = get_post_meta($post->ID, 'konzilo_id', true);
 
-  $post = array(
-    'type' => 'queue_last',
-    'queue' => $queues[0]->id
-  );
+  try {
+    $post = konzilo_get_data('updates', array(), $konzilo_id);
+  } catch(Exception $e) {
+    // Whateva.
+  }
+
+  if (empty($post)) {
+    $post = array(
+      'type' => 'queue_last',
+      'queue' => $queues[0]->id
+    );
+    $konzilo_status = __('Last in') . ' ' . $queues[0]->name;
+  }
+  else {
+    switch ($post->type) {
+    case 'now':
+      $konzilo_status = __('Publish now', 'konzilo');
+      break;
+
+    case 'stored':
+      $konzilo_status = __('Parked', 'konzilo');
+      break;
+
+    default:
+      $queue_map = array();
+      foreach ($queues as $queue) {
+        $queue_map[$queue->id] = $queue;
+      }
+      $konzilo_status = __('In') . ' ' . $queue_map[$post->queue]->name;
+    }
+  }
+
   $args = array(
     'queues' => $queues,
     'post' => $post,
@@ -771,6 +814,56 @@ function konzilo_submit_actions() {
     'templates/publish_form.html', $args);
 }
 add_action('post_submitbox_misc_actions', 'konzilo_submit_actions');
+
+function konzilo_before_delete($post_id) {
+  $konzilo_id = get_post_meta($post_id, 'konzilo_id', true);
+  if (empty($konzilo_id)) {
+    return;
+  }
+  try {
+    konzilo_delete_data('updates', $konzilo_id);
+  }
+  catch(Exception $e) {
+    //...ŋŋ
+  }
+}
+add_action('before_delete_post', 'konzilo_before_delete');
+
+
+function konzilo_transition($new_status, $old_status, $post) {
+  if ($new_status == $old_status) {
+    return;
+  }
+  $konzilo_id = get_post_meta($post->ID, 'konzilo_id', true);
+  if (empty($konzilo_id)) {
+    return;
+  }
+  try {
+    $data = konzilo_get_update($konzilo_id);
+    $data->status = $new_status;
+    if ($new_status == 'published') {
+      $data->type = 'now';
+    }
+    konzilo_put_data('updates', $konzilo_id, array('body' => $data));
+  }
+  catch(Exception $e) {
+    //...
+  }
+}
+add_action('transition_post_status', 'konzilo_transition', 10, 3);
+
+
+function konzilo_post_status() {
+  $args = array(
+    'label'                     => _x( 'done', 'Status General Name', 'konzilo' ),
+    'label_count'               => _n_noop( 'done (%s)',  'done (%s)', 'konzilo' ),
+    'public'                    => false,
+    'exclude_from_search'       => true,
+  );
+  register_post_status( 'done', $args );
+
+}
+add_action( 'init', 'konzilo_post_status', 0 );
 
 function konzilo_queue_t() {
   return array(
@@ -807,5 +900,14 @@ function konzilo_box_t() {
     'scheduledAt' => __('Scheduled at:', 'konzilo'),
     'addAnotherUpdate' => __('Add another update', 'konzilo'),
     'sentAt' => __('Sent at:', 'konzilo')
+  );
+}
+
+function konzilo_publishing_t() {
+  return array(
+    'lastin' => __('Last in', 'konzilo'),
+    'firstin'=>  __('First in', 'konzilo'),
+    'parked' => __('Parked', 'konzilo'),
+    'publishnow' => __('Publish now', 'konzilo')
   );
 }

@@ -1,6 +1,10 @@
 <?php
 function konzilo_submit_meta_box($post, $args = array() ) {
 	global $action;
+    wp_register_script('publishing', plugins_url( '../dist/publishing.js', __FILE__ ),
+                       array('jquery', 'underscore'));
+    wp_localize_script('publishing', 'konziloPublish', konzilo_publishing_t());
+    wp_enqueue_script('publishing');
 
 	$post_type = $post->post_type;
 	$post_type_object = get_post_type_object($post_type);
@@ -71,6 +75,9 @@ switch ( $post->post_status ) {
 	case 'pending':
 		_e('Pending Review');
 		break;
+case 'done':
+    _e('Done');
+    break;
 	case 'draft':
 	case 'auto-draft':
 		_e('Draft');
@@ -92,6 +99,8 @@ switch ( $post->post_status ) {
 <option<?php selected( $post->post_status, 'future' ); ?> value='future'><?php _e('Scheduled') ?></option>
 <?php endif; ?>
 <option<?php selected( $post->post_status, 'pending' ); ?> value='pending'><?php _e('Pending Review') ?></option>
+<option<?php selected( $post->post_status, 'done' ); ?> value='done'><?php _e('Done') ?></option>
+
 <?php if ( 'auto-draft' == $post->post_status ) : ?>
 <option<?php selected( $post->post_status, 'auto-draft' ); ?> value='draft'><?php _e('Draft') ?></option>
 <?php else : ?>
