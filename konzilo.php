@@ -27,6 +27,7 @@ if (!defined('KONZILO_URL')) {
 $base_dir = plugin_dir_path ( __FILE__ );
 require_once ($base_dir . '/includes/twig.inc');
 require_once ($base_dir . '/konzilo.pages.php');
+require_once($base_dir . '/includes/submitbox.inc');
 
 /**
  * Get the konzilo URL, either a global URL for multisite,
@@ -252,6 +253,42 @@ function konzilo_meta_box_setup() {
     wp_enqueue_style('social-fonts', plugins_url( 'fonts/css/fontello-embedded.css', __FILE__ ));
     add_action('add_meta_boxes', 'konzilo_add_meta_boxes');
     add_action('save_post', 'konzilo_save_meta', 10, 2 );
+    add_action('save_post', 'konzilo_save_update', 10, 2 );
+  }
+}
+
+function konzilo_save_update($post_id, $post ) {
+  $post_type = get_post_type_object( $post->post_type );
+  /* Check if the current user has permission to edit the post.*/
+  if ( !current_user_can( $post_type->cap->edit_post, $post_id ) )
+    return $post_id;
+  $konzilo_id = get_post_meta( $post->ID, 'konzilo_id', true );
+  if (!empty($konzilo_id)) {
+    $update = konzilo_get_data('updates', array(), $konzilo_id);
+  }
+  if (empty($update)) {
+    $update = new stdClass;
+  }
+  $update->text = $_POST['post_title'];
+  $update->post_id = $post->ID;
+  $update->type = $_POST['konzilo_type'];
+  $update->queue = $_POST['konzilo_queue'];
+  $update->status = $_POST['post_status'];
+  $update->link = get_permalink($post_id);
+  $update->updates = array();
+
+  if (!empty($_POST['ready_for_publishing'])) {
+    wp_transition_post_status('done', $_POST['post_status'], $post);
+    $update->status = 'done';
+  }
+  if (!empty($update->id)) {
+    konzilo_put_data('updates', $update->id, array(
+      'body' => $update));
+  }
+  else {
+    $result = konzilo_post_data('updates', array(
+      'body' => $update));
+    update_post_meta($post_id, 'konzilo_id', $result->id);
   }
 }
 
@@ -276,7 +313,7 @@ function konzilo_indexby($key, $arr) {
   $indexed = array();
   foreach ($arr as $item) {
     $indexed[$item->{$key}] = $item;
-  }
+ }
   return $indexed;
 }
 
@@ -696,6 +733,44 @@ function konzilo_settings() {
   echo '<div class="wrap"><div id="konzilo-social-queue"></div></div>';
 
 }
+
+class KonziloTwigExtension extends Twig_Extension {
+  public function getName() {
+    return 'konzilo_form';
+  }
+
+  public function getFunctions() {
+    return array(
+      new Twig_SimpleFunction('checked', function ($values, $type) {
+        $values = (object)$values;
+        if ($values->type == $type) {
+          return 'checked';
+        }
+      })
+    );
+  }
+}
+
+function konzilo_submit_actions() {
+  $queues = konzilo_get_queues();
+  $konzilo_status = __('Last in publishing list', 'konzilo');
+
+  $post = array(
+    'type' => 'queue_last',
+    'queue' => $queues[0]->id
+  );
+  $args = array(
+    'queues' => $queues,
+    'post' => $post,
+    'konzilo_status' => $konzilo_status
+  );
+  $base_dir = plugin_dir_path ( __FILE__ );
+  $twig = konzilo_twig($base_dir);
+  $twig->addExtension(new KonziloTwigExtension());
+  echo $twig->render(
+    'templates/publish_form.html', $args);
+}
+add_action('post_submitbox_misc_actions', 'konzilo_submit_actions');
 
 function konzilo_queue_t() {
   return array(

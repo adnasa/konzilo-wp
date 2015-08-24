@@ -1,0 +1,45 @@
+<div class="misc-pub-section misc-pub-post-status">
+  <label for="post_status">{{'Publishing:' | t }}</label>
+  <span id="konzilo-post-status">
+    {{konzilo_status}}
+  </span>
+  <a href="#konzilo-post-status"
+     class="edit-konzilo-status hide-if-no-js">
+    <span aria-hidden="true">{{'Edit' | t}}</span>
+    <span class="screen-reader-text">
+      {{'Edit status' | t }}
+    </span>
+  </a>
+  <div id="konzilo-status-select">
+    <label><input type="radio" name="konzilo_type"
+                  value="stored" {{checked(post, 'stored')}} />
+      <span>{{'Park' | t}}</span>
+    </label>
+
+    <label>
+      <input type="radio" name="queue_items" value="queue" {{checked(post, 'queue_last')}} />
+      <span>{{'Publish list' | t}}</span>
+    </label>
+    <select name="konzilo_queue">
+      {% for queue in queues%}
+      <option value="{{queue.id}}">{{queue.name}}</option>
+      {% endfor %}
+    </select>
+    <label>
+      <input type="radio" name="konzilo_type"
+                  value="queue_last" {{checked(post, 'queue_last')}} />
+      <span>{{'Put last in queue' | t}}</span>
+    </label>
+    <label>
+      <input type="radio" name="konzilo_type"
+                  value="queue_first" {{checked(post, 'queue_first')}} />
+      <span>{{'Put first in queue' | t}}</span>
+    </label>
+    <label>
+      <input type="radio" name="konzilo_type" value="now" {{checked(post, 'now')}} />
+      <span>{{'Publish now' | t}}</span>
+    </label>
+    <a href="#konzilo-post-status" class="save-konzilo-status hide-if-no-js button">{{'OK' | t}}</a>
+    <a href="#konzilo-post-status" class="cancel-konzilo-status hide-if-no-js button-cancel">{{'Cancel' | t}}</a>
+  </div>
+</div>
