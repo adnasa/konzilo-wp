@@ -613,47 +613,52 @@ class KonziloTwigExtension extends Twig_Extension {
 
 function konzilo_submit_actions() {
   global $post;
-  $queues = konzilo_get_queues();
-  $konzilo_id = get_post_meta($post->ID, 'konzilo_id', true);
+  try {
+    $queues = konzilo_get_queues();
+    $konzilo_id = get_post_meta($post->ID, 'konzilo_id', true);
+    $update = konzilo_get_post_update($post->ID);
 
-  $update = konzilo_get_post_update($post->ID);
-
-  if (empty($update)) {
-    $update = array(
-      'type' => 'queue_last',
-      'queue' => $queues[0]->id
-    );
-    $konzilo_status = __('Last in') . ' ' . $queues[0]->name;
-  }
-  else {
-    switch ($update->type) {
-    case 'now':
-      $konzilo_status = __('Publish now', 'konzilo');
-      break;
-
-    case 'stored':
-      $konzilo_status = __('Parked', 'konzilo');
-      break;
-
-    default:
-      $queue_map = array();
-      foreach ($queues as $queue) {
-        $queue_map[$queue->id] = $queue;
-      }
-      $konzilo_status = __('In') . ' ' . $queue_map[$update->queue]->name;
+    if (empty($update)) {
+      $update = array(
+        'type' => 'queue_last',
+        'queue' => $queues[0]->id
+      );
+      $konzilo_status = __('Last in') . ' ' . $queues[0]->name;
     }
-  }
+    else {
+      switch ($update->type) {
+      case 'now':
+        $konzilo_status = __('Publish now', 'konzilo');
+        break;
 
-  $args = array(
-    'queues' => $queues,
-    'post' => $update,
-    'konzilo_status' => $konzilo_status
-  );
-  $base_dir = plugin_dir_path ( __FILE__ );
-  $twig = konzilo_twig($base_dir);
-  $twig->addExtension(new KonziloTwigExtension());
-  echo $twig->render(
-    'templates/publish_form.html', $args);
+      case 'stored':
+        $konzilo_status = __('Parked', 'konzilo');
+        break;
+
+      default:
+        $queue_map = array();
+        foreach ($queues as $queue) {
+          $queue_map[$queue->id] = $queue;
+        }
+        $konzilo_status = __('In') . ' ' . $queue_map[$update->queue]->name;
+      }
+    }
+
+    $args = array(
+      'queues' => $queues,
+      'post' => $update,
+      'konzilo_status' => $konzilo_status
+    );
+    $base_dir = plugin_dir_path ( __FILE__ );
+    $twig = konzilo_twig($base_dir);
+    $twig->addExtension(new KonziloTwigExtension());
+    echo $twig->render(
+      'templates/publish_form.html', $args);
+
+  }
+  catch (Exception $e) {
+    // Still not sure how to display these errors.
+  }
 }
 add_action('post_submitbox_misc_actions', 'konzilo_submit_actions');
 
