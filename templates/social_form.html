@@ -1,0 +1,49 @@
+<div class="socialform">
+  <ul class="tabs">
+    <li><a href="#konzilo_text" class="active toggle-content">{{'Content' | t}}</a></li>
+    <li><a href="#konzilo_schedule" class="toggle-schedule">{{'Repeat entry' | t}}</a></li>
+  </ul>
+  <div class="content-form">
+    <label for="konzilo_text">{{'Description' | t}}</label>
+    <textarea class="text" name="konzilo_text">{{update.text}}</textarea>
+    <label for="channels">{{'Channels' | t}}</label>
+    <div class="channels">
+      {% for channel in channels%}
+      <label>
+        <input type="checkbox"
+               name="konzilo_channels[{{channel.id}}]"
+               {{channel_checked(update, channel.id)}}/>
+        <span>{{channel.formatted_username}}</span>
+      </label>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="schedule hide-if-js">
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          {% for item in header %}
+          <th>{{item.username}}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in schedule %}
+        <tr>
+
+        <td>{{row.time}}</td>
+        {% for value in row.values%}
+        <td>
+          <input type="checkbox"
+                 name="schedule[{{value.id}}][{{value.value}}]"
+                 value="{{value.value}}"
+                 {{ value.checked}} />
+        </td>
+        {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

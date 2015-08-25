@@ -1,8 +1,8 @@
 <?php
 
-function konzilo_twig($path) {
+function konzilo_twig($path, $reset=false) {
   static $environments = array();
-  if (!empty($environments[$path])) {
+  if (!empty($environments[$path]) && !$reset) {
     return $environments[$path];
   }
   $loader = new Twig_Loader_Filesystem($path);

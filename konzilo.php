@@ -247,21 +247,9 @@ add_action('load-post-new.php', 'konzilo_meta_box_setup');
 function konzilo_meta_box_setup() {
   if (konzilo_has_client()) {
     try {
-
-    $profiles = konzilo_get_profiles();
-    $konziloSocialNonce = konzilo_create_none_settings( basename( __FILE__ ), 'konzilo_nonce');
-    wp_register_script('social', plugins_url( 'dist/social.js', __FILE__ ), array('jquery', 'underscore'));
-    wp_localize_script('social', 'SocialSettings', array(
-      'profiles' => $profiles,
-      'konziloSocialNonce' => $konziloSocialNonce,
-    ));
-    wp_localize_script('social', 'SocialTranslations', konzilo_box_t());
-    wp_enqueue_script('social');
-    wp_enqueue_style('social', plugins_url('css/social.css', __FILE__));
-    wp_enqueue_style('social-fonts', plugins_url( 'fonts/css/fontello-embedded.css', __FILE__ ));
-    add_action('add_meta_boxes', 'konzilo_add_meta_boxes');
-    add_action('save_post', 'konzilo_save_meta', 10, 2 );
-    add_action('save_post', 'konzilo_save_update', 10, 2 );
+      wp_enqueue_style('social', plugins_url('css/social.css', __FILE__));
+      add_action('add_meta_boxes', 'konzilo_add_meta_boxes');
+      add_action('save_post', 'konzilo_save_update', 10, 2 );
     }
     catch(Exception $e) {
       // Notify the user somehow...
@@ -289,10 +277,51 @@ function konzilo_save_update($post_id, $post ) {
   $update->link = get_permalink($post_id);
   $update->updates = array();
 
-  if (!empty($_POST['ready_for_publishing'])) {
-    wp_transition_post_status('done', $_POST['post_status'], $post);
-    $update->status = 'done';
+  if (!empty($_POST['konzilo_text'])) {
+    $update->text = $_POST['konzilo_text'];
   }
+  $update_map = array();
+  $update_offset_map = array();
+  $schedule_map = array();
+  foreach ($update->updates as $text) {
+    if ($text->offset == 0) {
+      $update_map[$text->profile] = $text;
+    }
+    else {
+      $update_map[$text->profile . '_' . $text->offset] = $text;
+    }
+  }
+  $old_updates = $update->updates;
+  $update->updates = array();
+
+  if (!empty($_POST['schedule'])) {
+    foreach ($_POST['schedule'] as $profile => $times) {
+      foreach ($times as $time) {
+        $update_text = array(
+          'profile' => $profile,
+          'text' => $update->text,
+          'offset' => $time,
+        );
+        if (!empty($update_map[$profile . '_' . $time])) {
+          $update_text->id = $update_map[$profile . '_' . $time]->id;
+        }
+        $update->updates[] = $update_text;
+      }
+    }
+  }
+  if (!empty($_POST['konzilo_channels'])) {
+    foreach ($_POST['konzilo_channels'] as $key => $val) {
+      $new_update = (object)array(
+        'profile' => $key,
+        'text' => $update->text,
+      );
+      if (isset($update_map[$val])) {
+        $new_update->id = $update_map[$val]->id;
+      }
+      $update->updates[] = $new_update;
+    }
+  }
+
   if (!empty($update->id)) {
     $result = konzilo_put_data('updates', $update->id, array(
       'body' => $update));
@@ -334,52 +363,14 @@ function konzilo_add_meta_boxes() {
   global $post;
   global $pagenow;
 
-  $is_new = in_array( $pagenow, array( 'post-new.php' ) );
-  $profiles = konzilo_get_profiles();
-  $updates = konzilo_get_updates($post->ID);
-  $profile_map = konzilo_indexby('id', $profiles);
-  $update_map = konzilo_indexby('id', $updates);
-  $meta_value = get_post_meta( $post->ID, 'konzilo_post', true );
-  if (empty($meta_value)) {
-    if ($is_new) {
-      $meta_value = get_option('konzilo_defaults', array());
-    }
-    else {
-      $meta_value = array();
-    }
-  }
-  // remove any profiles that doesnt exist anymore.
-  // and add the sent parameter for updates that have been sent.
-  foreach ($meta_value as $bkey => &$box) {
-    if (!empty($box['id'])) {
-      if (!empty($update_map[$box['id']])) {
-        $box['sent'] = $update_map[$box['id']]->sent;
-        if (!empty($update_map[$box['id']]->sent_at)) {
-          $box['sent_at'] = $update_map[$box['id']]->sent_at;
-        }
-      }
-      // This update is not present on the server, but it has been there.
-      // Let's remove it.
-      else {
-        unset($meta_value[$bkey]);
-      }
-    }
-    foreach ($box['active'] as $key => $profile) {
-      if (empty($profile_map[$profile['profileId']])) {
-        unset($box['active'][$key]);
-      }
-    }
-  }
   // Add status to the posts.
-
-  wp_localize_script('social', 'socialdata', array(
-    'values' => array_values($meta_value),
-  ));
-  wp_enqueue_script('social');
-
+  //wp_localize_script('social', 'socialdata', array(
+  //  'values' => array_values($meta_value),
+  //));
+  //wp_enqueue_script('social');
   add_meta_box(
     'konzilo-social-post',      // Unique ID
-    esc_html__( 'Social media', 'example' ),    // Title
+    esc_html__( 'Konzilo', 'konzilo' ),    // Title
     'konzilo_meta_box',   // Callback function
     'post',         // Admin page (or post type)
     'normal',         // Context
@@ -387,101 +378,119 @@ function konzilo_add_meta_boxes() {
   );
 }
 
+class KonziloChannelExtension extends Twig_Extension {
+  public function getName() {
+    return 'konzilo_channel';
+  }
+
+  public function getFunctions() {
+    return array(
+      new Twig_SimpleFunction('channel_checked', function ($update, $profile) {
+        $update = (object)$update;
+        foreach ($update->updates as $text) {
+          if ($text->profile == $profile && $text->offset == 0) {
+            return 'checked';
+          }
+        }
+      })
+    );
+  }
+}
+
 function konzilo_meta_box( $object, $box ) {
   if (!konzilo_has_client()) {
     echo "Konzilo isn't authorized";
     return;
   }
-  return;
-}
 
-function konzilo_save_meta( $post_id, $post ) {
-  /* Verify the nonce before proceeding. */
-  if ( !isset( $_POST['konzilo_nonce'] ) || !wp_verify_nonce( $_POST['konzilo_nonce'], basename( __FILE__ ) ) )
-    return $post_id;
+  $typeMap = array(
+    'facebook' => 'dashicons dashicons-facebook',
+    'twitter' => 'dashicons dashicons-twitter',
+  );
 
-  /* Get the post type object. */
-  $post_type = get_post_type_object( $post->post_type );
+  $base_dir = plugin_dir_path ( __FILE__ );
+  $twig = konzilo_twig($base_dir, true);
+  if (!$twig->hasExtension('konzilo_channel')) {
+    $twig->addExtension(new KonziloChannelExtension());
+  }
+  $update = konzilo_get_post_update($object->ID);
+  $profiles = konzilo_get_data('profiles');
 
-  /* Check if the current user has permission to edit the post. */
-  if ( !current_user_can( $post_type->cap->edit_post, $post_id ) )
-    return $post_id;
+  if (empty($update)) {
+    $update = (object)array(
+      'text' => '',
+      'updates' => array()
+    );
+  }
+  $channels = array();
 
-  $meta_key = 'konzilo_post';
-  $meta_value = get_post_meta( $post_id, $meta_key, true );
-  $boxes = konzilo_box_from_post($meta_value);
-  $new_meta_value = $boxes;
-
-
-  /* If a new meta value was added and there was no previous value, add it. */
-  if (!empty($new_meta_value)) {
-    if ($_POST['post_status'] == 'publish') {
-      konzilo_post_updates($post_id, $new_meta_value, $meta_value);
-    }
-    if (empty($meta_value)) {
-      add_post_meta( $post_id, $meta_key, $new_meta_value, true );
-    }
-    /* If the new meta value does not match the old value, update it. */
-    else {
-      update_post_meta( $post_id, $meta_key, $new_meta_value );
+  $updateSchedule = array();
+  foreach ($update->updates as $text) {
+    if ($text->offset && $text->offset > 0) {
+      $updateSchedule[$text->profile] = !empty($updateSchedule[$text->profile]) ? $updateSchedule[$text->profile] : array();
+      $updateSchedule[$text->profile][$text->offset] = $text;
     }
   }
-  /* If there is no new meta value but an old value exists, delete it. */
-  elseif ( '' == $new_meta_value && $meta_value )
-    delete_post_meta( $post_id, $meta_key, $meta_value );
 
-  // Flush update cache.
-  wp_cache_delete('konzilo_updates_' . $post_id);
-}
+  $header = array_map(function ($profile) use ($typeMap) {
+    return array(
+      'username' => $profile->formatted_username,
+      'service' => $profile->service
+    );
+  }, $profiles);
 
-function konzilo_box_from_post($old_data) {
-  $boxes = array();
-  if (isset($_POST['socialbox_rows'])) {
-    foreach($_POST['socialbox_rows'] as $id) {
-      $boxes[$id] = array(
-        'active' => array(),
-        'publishSettings' => array(),
-      );
-      if (isset($_POST['updateid'][$id])) {
-        $boxes[$id]['id'] = $_POST['updateid'][$id];
-      }
-      if (empty($_POST['socialbox'][$id])) {
-        if (!empty($old_data[$id])) {
-          $boxes[$id] = $old_data[$id];
-        }
-      }
-      else {
-        $profiles = $_POST['socialbox'][$id];
-        foreach($profiles as $profile_id => $text) {
-          $update_text = array(
-            'profileId' => $profile_id,
-            'text' => (($text) ? $text : ''),
+  $hourCheckboxes = function ($hour, $label) use ($profiles, $updateSchedule) {
+    return array(
+      'time' => $label,
+      'values' => array_map(function ($profile) use ($hour, $updateSchedule) {
+          return array(
+            'value' => $hour * 3600,
+            'id' => $profile->id,
+            'checked' => !empty($updateSchedule[$profile->id][$hour * 3600]) ?
+            'checked' : ''
           );
-          if (isset($_POST['socialboxid'][$id][$profile_id])) {
-            $update_text['id'] = $_POST['socialboxid'][$id][$profile_id];
-          }
-          $boxes[$id]['active'][] = $update_text;
-        }
-        if (isset($_POST['socialPublishSettings'][$id])) {
-          date_default_timezone_set(get_option('timezone_string'));
-          $boxes[$id]['publishSettings']['type'] = $_POST['socialPublishSettings'][$id];
-          if ( isset($_POST['socialPublishDate'][$id])
-               && isset($_POST['slots'][$id]['hour'])
-               && isset($_POST['slots'][$id]['minute'])) {
-            $date = explode('-', $_POST['socialPublishDate'][$id]);
-            $value = date('c', mktime($_POST['slots'][$id]['hour'],
-                                      $_POST['slots'][$id]['minute'],
-                                      0,
-                                      $date[1],
-                                      $date[2],
-                                      $date[0]));
-            $boxes[$id]['publishSettings']['value'] = $value;
-          }
-        }
-      }
+        }, $profiles)
+    );
+  };
+
+  $scheme = array(
+    2 => __('+ 2 hours', 'konzilo'),
+    4 => __('+ 4 hours', 'konzilo'),
+    8 => __('+ 8 hours', 'konzilo'),
+    16 => __('+ 16 hours', 'konzilo'),
+    32 => __('+ 32 hours', 'konzilo'),
+    64 => __('+ 64 hours', 'konzilo'),
+    128 => __('+ 128 hours', 'konzilo')
+  );
+
+
+  $schedule = array();
+
+  foreach ($scheme as $hour => $label) {
+    $schedule[] = $hourCheckboxes($hour, $label);
+  }
+
+  echo $twig->render('templates/social_form.html', array(
+    'update' => $update,
+    'channels' => $profiles,
+    'header' => $header,
+    'schedule' => $schedule
+  ));
+
+}
+
+
+function konzilo_get_post_update($post_id) {
+  $konzilo_id = get_post_meta($post_id, 'konzilo_id', true);
+  if (!empty($konzilo_id)) {
+    try {
+      $post = konzilo_get_data('updates', array(), $konzilo_id);
+      return $post;
+    } catch(Exception $e) {
+      // Whateva.
     }
   }
-  return $boxes;
+  return null;
 }
 
 function konzilo_translate_codes($subject, $post) {
@@ -513,93 +522,6 @@ function konzilo_translate_codes($subject, $post) {
   return $subject;
 }
 
-function konzilo_post_updates($id, &$social_updates, $old_updates) {
-  $post = get_post($id);
-  $defaults = array(
-    'post_id' => $id,
-    'link' => get_permalink($id),
-    'updates' => array(),
-  );
-  if (is_multisite()) {
-    $defaults['page'] = get_option('konzilo_page');
-    $defaults['organisation'] = get_option('konzilo_organisation');
-  }
-    $get_values = function ($updates) {
-        $updates = array_filter($updates, function ($update) {
-            return !empty($update['id']);
-        });
-        return array_map(function ($update) {
-            return $update['id'];
-        }, $updates);
-    };
-    if (!empty($old_updates)) {
-        $new_ids = $get_values($social_updates);
-        $old_ids = $get_values($old_updates);
-        // Remove boxes that shouldnt be there anymore.
-        foreach (array_diff($old_ids, $new_ids) as $delete_id) {
-            try {
-                konzilo_delete_data('updates', $delete_id);
-            }
-            catch(Exception $e) {
-              // We might come across things that are already deleted.
-              // it's fine.
-            }
-        }
-    }
-    foreach ($social_updates as $key => $update) {
-        // Boxes without active profiles are no use saving.
-        if (empty($update['active'])) {
-            continue;
-        }
-        $data = array(
-            'type' => $update['publishSettings']['type'],
-        ) + $defaults;
-
-        if (!empty($update['id'])) {
-            $data['id'] = $update['id'];
-        }
-
-        if (!empty($update['publishSettings']['value'])) {
-            $data['scheduled_at'] = $update['publishSettings']['value'];
-        }
-
-        foreach ($update['active'] as $text) {
-          if (!empty($text['text'])) {
-            $update = array(
-              'profile' => $text['profileId'],
-              'text' => konzilo_translate_codes($text['text'], $post),
-            );
-            if (!empty($text['id'])) {
-              $update['id'] = $text['id'];
-            }
-            $data['updates'][] = $update;
-          }
-        }
-        if (!empty($data['updates'])) {
-          $queue = get_option('konzilo_queue');
-          if (!empty($queue)) {
-            $data['queue'] = $queue;
-          }
-          if (empty($data['sent'])) {
-            if (empty($data['id'])) {
-              $result = konzilo_post_data(
-                'updates',
-                array('body' => $data));
-            }
-            else {
-              $result = konzilo_put_data('updates', $data['id'], array(
-                'body' => $data));
-            }
-          }
-          $social_updates[$key]['id'] = $result->id;
-          foreach ($social_updates[$key]['active'] as $key => &$active) {
-            $active['id'] = $result->updates[$key]->id;
-            $active['profileId'] = $result->updates[$key]->profile;
-          }
-        }
-    }
-}
-
 function konzilo_publish($id) {
     if ($_SERVER['REQUEST_METHOD'] != 'POST') {
         $social_updates = get_post_meta( $id, 'konzilo_post', true);
@@ -626,82 +548,6 @@ function konzilo_curate() {
   wp_enqueue_script('iframefix');
   print '<iframe class="curate" src="https://konzilo.kntnt.it/curate?iframe=1" style="width: 95%; margin-top: 20px; box-shadow: 2px 2px 5px rgba(0,0,0,0.26);"></iframe>';
 }
-
-add_action('admin_init', function () {
-  register_setting( 'konzilo_settings', 'konzilo_save_queue');
-});
-
-
-function konzilo_save_queue() {
-    if (empty($_POST['social_nonce']) || !wp_verify_nonce($_POST['social_nonce'], 'social_settings')) {
-        wp_die(_('Could not verify request'));
-        exit();
-    }
-
-  $body = array(
-    'name' => sanitize_text_field($_POST['name']),
-    'slots' => array(),
-  );
-  if (is_multisite()) {
-    $body['organisation'] = get_option('konzilo_organisation');
-  }
-  $days = array();
-  foreach ($_POST['days'] as $day => $value) {
-    if ($value || $value == 0) {
-      $days[] = $day;
-    }
-  }
-  if (!empty($_POST['slots'])) {
-    foreach ($_POST['slots'] as $slot) {
-      $body['slots'][] = $slot['hour'] . ':' . $slot['minute'] . ':00';
-    }
-  }
-  $body['days'] = implode(',', $days);
-  konzilo_post_data('queues', array('body' => $body));
-  wp_redirect( $_SERVER['HTTP_REFERER'] . '&updated=savequeue' );
-  exit();
-}
-add_action('admin_action_konzilo_save_queue', 'konzilo_save_queue');
-
-function konzilo_edit_queue() {
-    if (empty($_POST['social_nonce']) || !wp_verify_nonce($_POST['social_nonce'], 'social_settings')) {
-        wp_die(_('Could not verify request'));
-        exit();
-    }
-  $body = array(
-    'id' => sanitize_text_field($_POST['id']),
-    'name' => sanitize_text_field($_POST['name']),
-    'slots' => array(),
-  );
-  if (is_multisite()) {
-    $body['organisation'] = get_option('konzilo_organisation');
-  }
-  $days = array();
-  foreach ($_POST['days'] as $day => $value) {
-    if ($value || $value == 0) {
-      $days[] = $day;
-    }
-  }
-  if (!empty($_POST['slots'])) {
-    foreach ($_POST['slots'] as $slot) {
-      $body['slots'][] = $slot['hour'] . ':' . $slot['minute'] . ':00';
-    }
-  }
-  $body['days'] = implode(',', $days);
-  konzilo_put_data('queues', $body['id'], array('body' => $body));
-  update_option('konzilo_queue', intval($body['id']));
-  wp_redirect( $_SERVER['HTTP_REFERER'] . '&updated=queue' );
-  exit();
-}
-add_action('admin_action_konzilo_edit_queue', 'konzilo_edit_queue');
-
-function konzilo_save_defaults() {
-  $box = konzilo_box_from_post();
-  update_option('konzilo_defaults', $box);
-  wp_redirect( $_SERVER['HTTP_REFERER'] . '&updated=defaults' );
-  exit();
-}
-add_action('admin_action_social_save_defaults', 'konzilo_save_defaults');
 
 function konzilo_get_queues() {
   return konzilo_get_data('queues');
@@ -770,21 +616,17 @@ function konzilo_submit_actions() {
   $queues = konzilo_get_queues();
   $konzilo_id = get_post_meta($post->ID, 'konzilo_id', true);
 
-  try {
-    $post = konzilo_get_data('updates', array(), $konzilo_id);
-  } catch(Exception $e) {
-    // Whateva.
-  }
+  $update = konzilo_get_post_update($post->ID);
 
-  if (empty($post)) {
-    $post = array(
+  if (empty($update)) {
+    $update = array(
       'type' => 'queue_last',
       'queue' => $queues[0]->id
     );
     $konzilo_status = __('Last in') . ' ' . $queues[0]->name;
   }
   else {
-    switch ($post->type) {
+    switch ($update->type) {
     case 'now':
       $konzilo_status = __('Publish now', 'konzilo');
       break;
@@ -798,13 +640,13 @@ function konzilo_submit_actions() {
       foreach ($queues as $queue) {
         $queue_map[$queue->id] = $queue;
       }
-      $konzilo_status = __('In') . ' ' . $queue_map[$post->queue]->name;
+      $konzilo_status = __('In') . ' ' . $queue_map[$update->queue]->name;
     }
   }
 
   $args = array(
     'queues' => $queues,
-    'post' => $post,
+    'post' => $update,
     'konzilo_status' => $konzilo_status
   );
   $base_dir = plugin_dir_path ( __FILE__ );

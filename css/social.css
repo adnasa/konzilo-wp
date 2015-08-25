@@ -229,3 +229,66 @@ label[for=konzilo-status]:before {
     top: -1px;
     color: #82878c;
 }
+
+.socialform label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.socialform textarea {
+    width: 100%;
+    min-height: 50px;
+}
+
+.socialform {
+}
+
+.socialform .tabs {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+.socialform .tabs li {
+    float: left;
+    margin: 0;
+    padding: 0;
+    margin-right: 10px;
+    
+}
+
+.socialform .tabs li a.active {
+    background: #fdfdfd;
+    border: 1px solid #dfdfdf;
+    border-bottom: 1px solid #fdfdfd;
+    color: #000;
+}
+
+.socialform .tabs li a {
+   padding: 5px;
+   display: block;
+   text-decoration: none;
+}
+
+.socialform .tabs li a:focus {
+    box-shadow: none;
+    -webkit-box-shadow: none;
+}
+
+.socialform .content-form, .socialform .schedule {
+    margin-top: -1px;
+    background: #fdfdfd;
+    border: 1px solid #dfdfdf;
+    padding: 10px;
+}
+
+.socialform .channels label {
+    display: inline-block;
+    margin-right: 5px;
+    font-weight: normal;
+}
+
+.socialform .schedule table {
+    text-align: center;
+    width: 100%;
+}

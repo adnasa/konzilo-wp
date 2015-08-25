@@ -64,4 +64,25 @@
   });
 
   $('input[name=queue_items]').change(toggleQueue);
+
+  $('.socialform .toggle-content').click(function (e) {
+    e.preventDefault();
+    $('.socialform .toggle-schedule').removeClass('active');
+    $('.socialform .toggle-content').addClass('active');
+    $('.socialform .schedule').hide();
+    $('.socialform .content-form').show();
+  });
+
+  $('.socialform .toggle-schedule').click(function (e) {
+    e.preventDefault();
+    $('.socialform .toggle-content').removeClass('active');
+    $('.socialform .toggle-schedule').addClass('active');
+    $('.socialform .schedule').show();
+    $('.socialform .content-form').hide();
+  });
+
+  $('input[name=ready_for_publishing]').click(function() {
+    $('select[name=post_status]').val('done');
+  });
+
 }(jQuery));
