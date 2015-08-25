@@ -34,7 +34,7 @@ require_once($base_dir . '/includes/submitbox.inc');
  * or the default url.
  */
 function konzilo_get_url() {
-  return is_multisite() ? get_site_option('konzilo_url') : KONZILO_URL;
+  return is_multisite() ? get_site_option('konzilocustom_url') : KONZILO_URL;
 }
 
 /**
@@ -169,7 +169,10 @@ function konzilo_get_data($resource, $args = array(), $id = NULL, $params = arra
   }
   $result = wp_remote_get($uri, $args);
   if ($result['response']['code'] >= 400) {
+    echo $result['response']['body'];
+    exit();
     throw new Exception($result['response']['code']);
+
   }
   return json_decode($result['body']);
 }
@@ -273,11 +276,19 @@ function konzilo_save_update($post_id, $post ) {
   $update->text = $_POST['post_title'];
   $update->post_id = $post->ID;
   $update->type = $_POST['konzilo_type'];
-  $update->queue = $_POST['konzilo_queue'];
+  if (!empty($_POST['konzilo_queue'])) {
+    $update->queue = $_POST['konzilo_queue'];
+  }
   $update->status = $_POST['post_status'];
   $update->link = get_permalink($post_id);
   $update->updates = array();
 
+  if (empty($update->organisation)) {
+    $org = get_option('konzilocustom_organisation');
+    if (!empty($org)) {
+      $update->organisation = $org;
+    }
+  }
   if (!empty($_POST['konzilo_text'])) {
     $update->text = $_POST['konzilo_text'];
   }
@@ -631,11 +642,16 @@ function konzilo_submit_actions() {
     $update = konzilo_get_post_update($post->ID);
 
     if (empty($update)) {
-      $update = array(
-        'type' => 'queue_last',
-        'queue' => $queues[0]->id
-      );
-      $konzilo_status = __('Last in') . ' ' . $queues[0]->name;
+      $update = array();
+      if (!empty($queues)) {
+        $update['type'] = 'queue_last';
+        $update['queue'] = $queues[0]->id;
+        $konzilo_status = __('Last in', 'konzilo') . ' ' . $queues[0]->name;
+      }
+      else {
+        $update['type'] = 'stored';
+        $konzilo_status = __('Parked', 'konzilo');
+      }
     }
     else {
       switch ($update->type) {
@@ -656,9 +672,9 @@ function konzilo_submit_actions() {
                         $queue_map[$update->queue]->name;
       }
     }
-
     $args = array(
       'queues' => $queues,
+      'has_queues' => !empty($queues),
       'post' => $update,
       'konzilo_status' => $konzilo_status
     );

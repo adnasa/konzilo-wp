@@ -7,7 +7,7 @@ function konzilo_twig($path, $reset=false) {
   }
   $loader = new Twig_Loader_Filesystem($path);
   $twig = new Twig_Environment($loader, array(
-    'cache' => '/tmp',
+    //'cache' => '/tmp',
   ));
   $twig->addExtension(new KonziloWordpressTwig());
   $environments[$path] = $twig;

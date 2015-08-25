@@ -15,7 +15,7 @@
                   value="stored" {{checked(post, 'stored')}} />
       <span>{{__('Park')}}</span>
     </label>
-
+    {% if has_queues %}
     <label>
       <input type="radio" name="queue_items" value="queue" {{checked(post, ['queue_last', 'queue_first'])}} />
       <span>{{__('Publish list')}}</span>
@@ -37,6 +37,7 @@
         <span>{{__('Put first in queue')}}</span>
       </label>
     </div>
+    {% endif %}
     <label>
       <input type="radio" name="konzilo_type" value="now" {{checked(post, 'now')}} />
       <span>{{__('Publish now')}}</span>
