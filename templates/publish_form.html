@@ -1,24 +1,24 @@
 <div class="misc-pub-section misc-pub-post-status">
-  <label for="konzilo-status">{{'Publishing:' | t }}</label>
+  <label for="konzilo-status">{{__('Publishing:')}}</label>
   <span id="konzilo-post-status">
     {{konzilo_status}}
   </span>
   <a href="#konzilo-post-status"
      class="edit-konzilo-status hide-if-no-js">
-    <span aria-hidden="true">{{'Edit' | t}}</span>
+    <span aria-hidden="true">{{__('Edit')}}</span>
     <span class="screen-reader-text">
-      {{'Edit status' | t }}
+      {{__('Edit status')}}
     </span>
   </a>
   <div id="konzilo-status-select" class="hide-if-js">
     <label><input type="radio" name="konzilo_type"
                   value="stored" {{checked(post, 'stored')}} />
-      <span>{{'Park' | t}}</span>
+      <span>{{__('Park')}}</span>
     </label>
 
     <label>
       <input type="radio" name="queue_items" value="queue" {{checked(post, ['queue_last', 'queue_first'])}} />
-      <span>{{'Publish list' | t}}</span>
+      <span>{{__('Publish list')}}</span>
     </label>
     <div class="queue-settings">
       <select name="konzilo_queue">
@@ -29,17 +29,17 @@
       <label>
         <input type="radio" name="konzilo_type"
                value="queue_last" {{checked(post, 'queue_last')}} />
-        <span>{{'Put last in queue' | t}}</span>
+        <span>{{__('Put last in queue')}}</span>
       </label>
       <label>
         <input type="radio" name="konzilo_type"
                value="queue_first" {{checked(post, 'queue_first')}} />
-        <span>{{'Put first in queue' | t}}</span>
+        <span>{{__('Put first in queue')}}</span>
       </label>
     </div>
     <label>
       <input type="radio" name="konzilo_type" value="now" {{checked(post, 'now')}} />
-      <span>{{'Publish now' | t}}</span>
+      <span>{{__('Publish now')}}</span>
     </label>
     <a href="#konzilo-post-status" class="save-konzilo-status hide-if-no-js button">{{'OK' | t}}</a>
     <a href="#konzilo-post-status" class="cancel-konzilo-status hide-if-no-js button-cancel">{{'Cancel' | t}}</a>

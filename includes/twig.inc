@@ -7,7 +7,7 @@ function konzilo_twig($path, $reset=false) {
   }
   $loader = new Twig_Loader_Filesystem($path);
   $twig = new Twig_Environment($loader, array(
-    //'cache' => '/tmp',
+    'cache' => '/tmp',
   ));
   $twig->addExtension(new KonziloWordpressTwig());
   $environments[$path] = $twig;
@@ -41,6 +41,10 @@ class KonziloWordpressTwig extends Twig_Extension {
       new Twig_SimpleFunction('do_settings_sections', function ($name) {
         do_settings_sections($name);
       }),
+      new Twig_SimpleFunction('__', function ($str) {
+        return __($str, 'konzilo');
+      }),
+
       new Twig_SimpleFunction('submit_button', function () {
         submit_button();
       })

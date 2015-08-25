@@ -262,10 +262,11 @@ function konzilo_save_update($post_id, $post ) {
   /* Check if the current user has permission to edit the post.*/
   if ( !current_user_can( $post_type->cap->edit_post, $post_id ) || !isset($_POST['konzilo_type']))
     return $post_id;
-  $konzilo_id = get_post_meta( $post->ID, 'konzilo_id', true );
-  if (!empty($konzilo_id)) {
-    $update = konzilo_get_data('updates', array(), $konzilo_id);
+  try {
+    $update = konzilo_get_post_update($post->ID);
   }
+  catch (Exception $e) {}
+
   if (empty($update)) {
     $update = new stdClass;
   }
@@ -413,14 +414,25 @@ function konzilo_meta_box( $object, $box ) {
   if (!$twig->hasExtension('konzilo_channel')) {
     $twig->addExtension(new KonziloChannelExtension());
   }
-  $update = konzilo_get_post_update($object->ID);
-  $profiles = konzilo_get_data('profiles');
-
+  try {
+    $update = konzilo_get_post_update($object->ID);
+    $profiles = konzilo_get_data('profiles');
+  }
+  catch (Exception $e) {
+    // We need to deal with these things in some way.
+  }
   if (empty($update)) {
     $update = (object)array(
       'text' => '',
       'updates' => array()
     );
+    foreach ($profiles as $profile) {
+      $update->updates[] = (object)array(
+        'profile' => $profile->id,
+        'text' => $update->text,
+        'offset' => 0,
+      );
+    }
   }
   $channels = array();
 
@@ -640,7 +652,8 @@ function konzilo_submit_actions() {
         foreach ($queues as $queue) {
           $queue_map[$queue->id] = $queue;
         }
-        $konzilo_status = __('In') . ' ' . $queue_map[$update->queue]->name;
+        $konzilo_status = __('In', 'konzilo') . ' ' .
+                        $queue_map[$update->queue]->name;
       }
     }
 
@@ -755,6 +768,23 @@ function konzilo_publishing_t() {
     'lastin' => __('Last in', 'konzilo'),
     'firstin'=>  __('First in', 'konzilo'),
     'parked' => __('Parked', 'konzilo'),
-    'publishnow' => __('Publish now', 'konzilo')
+    'publishnow' => __('Publish now', 'konzilo'),
+  );
+}
+
+function konzilo_additional_t() {
+  return array(
+    __('Publishing:', 'konzilo'),
+    __('Edit', 'konzilo'),
+    __('Edit status', 'konzilo'),
+    __('Park', 'konzilo'),
+    __('Publish list', 'konzilo'),
+    __('Put last in queue', 'konzilo'),
+    __('Put first in queue', 'konzilo'),
+    __('Publish now', 'konzilo'),
+    __('Description', 'konzilo'),
+    __('Channels', 'konzilo'),
+    __('Content', 'konzilo'),
+    __('Repeat entry', 'konzilo')
   );
 }
