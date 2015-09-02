@@ -42,7 +42,16 @@
       <input type="radio" name="konzilo_type" value="now" {{checked(post, 'now')}} />
       <span>{{__('Publish now')}}</span>
     </label>
+    <label>
+      <input type="radio" name="konzilo_type" value="date" {{checked(post, 'scheduled')}} />
+      <span>{{__('Schedule')}}</span>
+    </label>
+    <div id="timestampdiv" class="hide-if-js">
+      {{touch_time(action)}}
+    </div>
+
     <a href="#konzilo-post-status" class="save-konzilo-status hide-if-no-js button">{{'OK' | t}}</a>
     <a href="#konzilo-post-status" class="cancel-konzilo-status hide-if-no-js button-cancel">{{'Cancel' | t}}</a>
+
   </div>
 </div>

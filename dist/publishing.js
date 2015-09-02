@@ -10,7 +10,17 @@
       $('.queue-settings').slideUp();
     }
   };
+  var toggleScheduled = function () {
+    if ($('input[value=date]').attr('checked')) {
+      $('#timestampdiv').slideDown();
+    }
+    else {
+      $('#timestampdiv').slideUp();
+    }
+  };
+
   toggleQueue();
+  toggleScheduled();
 
   $('.edit-konzilo-status').click(function (e) {
     e.preventDefault();
@@ -60,6 +70,12 @@
     if (type !== 'queue_last' && type !== 'queue_first') {
       $('input[name=queue_items]').attr('checked', null);
       $('.queue-settings').slideUp();
+    }
+    if (type === 'date') {
+      $('#timestampdiv').slideDown();
+    }
+    else {
+      $('#timestampdiv').slideUp();
     }
   });
 

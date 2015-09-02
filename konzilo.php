@@ -21,7 +21,7 @@ if (   file_exists( $composer_autoload = __DIR__ . '/vendor/autoload.php' ) /* c
 
 // Default konzilo location.
 if (!defined('KONZILO_URL')) {
-  define('KONZILO_URL', 'http://localhost:8000');
+  define('KONZILO_URL', 'http://konzilobackend_web_1:8000');
 }
 
 $base_dir = plugin_dir_path ( __FILE__ );
@@ -129,7 +129,6 @@ function konzilo_refresh_token() {
   );
   $result = wp_remote_post($url . '/oauth2/token/', $args);
   if (is_object($result)) {
-
     throw new Exception($result->get_error_message());
   }
   if (is_object($result) || $result['response']['code'] > 399) {
@@ -172,7 +171,6 @@ function konzilo_get_data($resource, $args = array(), $id = NULL, $params = arra
     echo $result['response']['body'];
     exit();
     throw new Exception($result['response']['code']);
-
   }
   return json_decode($result['body']);
 }
@@ -283,6 +281,19 @@ function konzilo_save_update($post_id, $post ) {
   $update->link = get_permalink($post_id);
   $update->updates = array();
 
+  if ($update->type == 'date') {
+    $time = $_POST['aa'] .
+          '-' . $_POST['mm'] .
+          '-' .
+          $_POST['jj'] . 'T' .
+          $_POST['hh'] . ':' .
+          $_POST['mn'] . ':' .
+          $_POST['ss'] . '+' .
+          '0'  . get_option('gmt_offset') . ':00';
+
+    $update->scheduled_at = strtotime($time);
+    $update->scheduled_at = date('c', $update->scheduled_at);
+  }
   if (empty($update->organisation)) {
     $org = get_option('konzilocustom_organisation');
     if (!empty($org)) {
@@ -430,6 +441,7 @@ function konzilo_meta_box( $object, $box ) {
     $profiles = konzilo_get_data('profiles');
   }
   catch (Exception $e) {
+    return;
     // We need to deal with these things in some way.
   }
   if (empty($update)) {
@@ -629,6 +641,9 @@ class KonziloTwigExtension extends Twig_Extension {
              $values->type == $type) {
           return 'checked';
         }
+      }),
+      new Twig_SimpleFunction('touch_time', function ($action) {
+          touch_time(($action == 'edit'), 1);
       })
     );
   }
@@ -636,6 +651,7 @@ class KonziloTwigExtension extends Twig_Extension {
 
 function konzilo_submit_actions() {
   global $post;
+  global $action;
   try {
     $queues = konzilo_get_queues();
     $konzilo_id = get_post_meta($post->ID, 'konzilo_id', true);
@@ -663,20 +679,33 @@ function konzilo_submit_actions() {
         $konzilo_status = __('Parked', 'konzilo');
         break;
 
+      case 'date':
+        $default = date_default_timezone_get();
+        date_default_timezone_set(get_option('timezone_string'));
+        $konzilo_status = __('Scheduled at:', 'konzilo') . ' ' .
+                        date('Y-m-d H:i', strtotime($update->scheduled_at));
+        date_default_timezone_set($default);
+        break;
+
       default:
         $queue_map = array();
         foreach ($queues as $queue) {
           $queue_map[$queue->id] = $queue;
         }
+        if (empty($update->queue)) {
+          $update->queue = $queues[0]->id;
+        }
         $konzilo_status = __('In', 'konzilo') . ' ' .
                         $queue_map[$update->queue]->name;
+        break;
       }
     }
     $args = array(
       'queues' => $queues,
       'has_queues' => !empty($queues),
       'post' => $update,
-      'konzilo_status' => $konzilo_status
+      'konzilo_status' => $konzilo_status,
+      'action' => $action
     );
     $base_dir = plugin_dir_path ( __FILE__ );
     $twig = konzilo_twig($base_dir);

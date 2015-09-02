@@ -292,3 +292,8 @@ label[for=konzilo-status]:before {
     text-align: center;
     width: 100%;
 }
+
+#konzilo-status-select .save-timestamp,
+#konzilo-status-select .cancel-timestamp {
+    display: none;
+}
