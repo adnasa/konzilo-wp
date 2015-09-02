@@ -567,13 +567,6 @@ add_action( 'publish_post', 'konzilo_publish');
 
 
 add_action('admin_menu', function () {
-  add_options_page (
-      __('Social publishing', 'konzilo'),
-      __('Social publishing', 'konzilo'),
-    'switch_themes',
-    'konzilo_settings',
-    'konzilo_settings'
-  );
   add_menu_page(__('Curate content', 'konzilo'), 'Curate content', 'publish_posts', 'curate_content', 'konzilo_curate');
 });
 
@@ -586,45 +579,6 @@ function konzilo_curate() {
 
 function konzilo_get_queues() {
   return konzilo_get_data('queues');
-}
-
-function konzilo_settings() {
-  try {
-    $queues = konzilo_get_queues();
-  }
-  catch(Exception $e) {
-    echo 'Could not establish connection, check your settings';
-    return;
-  }
-  $queue = get_option('konzilo_queue');
-  $defaults = get_option('konzilo_defaults', array());
-  if (konzilo_has_client()) {
-    wp_register_script('social', plugins_url( 'dist/social.js', __FILE__ ),
-                       array('jquery', 'underscore'));
-    foreach ($queues as $q) {
-        $q->days = array_map(function ($val) {
-            return intval($val);
-        }, explode(',', $q->days));
-    }
-    wp_localize_script('social', 'SocialSettings', array(
-      'active' => array(),
-      'queues' => $queues,
-      'queue' => intval($queue),
-      'admin_url' => admin_url('admin.php'),
-      'nonce' => wp_create_nonce('social_settings'),
-      'defaults' => $defaults,
-      'profiles' => konzilo_get_profiles(),
-      'konziloSocialNonce' => konzilo_create_none_settings( basename( __FILE__ ), 'konzilo_nonce'),
-    ));
-    wp_localize_script('social', 'SocialTranslations',
-                       konzilo_queue_t() + konzilo_box_t());
-    wp_enqueue_script('social');
-    wp_enqueue_style('social', plugins_url('css/social.css', __FILE__));
-    wp_enqueue_style('social', plugins_url( 'fonts/css/fontello-embedded.css', __FILE__ ));
-
-  }
-  echo '<div class="wrap"><div id="konzilo-social-queue"></div></div>';
-
 }
 
 class KonziloTwigExtension extends Twig_Extension {
@@ -650,6 +604,9 @@ class KonziloTwigExtension extends Twig_Extension {
 }
 
 function konzilo_submit_actions() {
+  if (!konzilo_has_client()) {
+    return;
+  }
   global $post;
   global $action;
   try {
