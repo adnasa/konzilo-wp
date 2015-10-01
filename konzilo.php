@@ -230,7 +230,7 @@ function konzilo_get_updates($post_id, $cache = true) {
     if (empty($updates)) {
       $args = array('post_id' => $post_id);
       if (is_multisite()) {
-        $args['page'] = get_option('konzilo_page');
+        $args['site'] = get_option('konzilocustom_site');
       }
       else {
         $args['application'] = true;
@@ -299,6 +299,9 @@ function konzilo_save_update($post_id, $post ) {
     if (!empty($org)) {
       $update->organisation = $org;
     }
+
+    $site = get_option('konzilocustom_site');
+    $update->site = !empty($site) ? $site : NULL;
   }
   if (!empty($_POST['konzilo_text'])) {
     $update->text = $_POST['konzilo_text'];
