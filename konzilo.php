@@ -21,7 +21,7 @@ if (   file_exists( $composer_autoload = __DIR__ . '/vendor/autoload.php' ) /* c
 
 // Default konzilo location.
 if (!defined('KONZILO_URL')) {
-  define('KONZILO_URL', 'http://konzilobackend_web_1:8000');
+  define('KONZILO_URL', 'https://app.konzilo.com');
 }
 
 $base_dir = plugin_dir_path ( __FILE__ );
