@@ -264,9 +264,13 @@ if ( !in_array( $post->post_status, array('publish', 'future', 'private') ) || 0
 
 function konzilo_add_submit_metabox() {
   if (konzilo_has_client()) {
-    remove_meta_box('submitdiv', 'post', 'side');
-    add_meta_box('submitdiv', __('Publish'), 'konzilo_submit_meta_box', 'post', 'side', 'high');
+    global $post;
+    $update = konzilo_get_post_update($post->ID);
+    if (!$update->sent) {
+      remove_meta_box('submitdiv', 'post', 'side');
+      add_meta_box('submitdiv', __('Publish'), 'konzilo_submit_meta_box', 'post', 'side', 'high');
+    }
   }
 }
 
-add_action('admin_menu', 'konzilo_add_submit_metabox');
+add_action('admin_head', 'konzilo_add_submit_metabox');

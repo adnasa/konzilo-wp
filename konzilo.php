@@ -616,6 +616,9 @@ function konzilo_submit_actions() {
     $queues = konzilo_get_queues();
     $konzilo_id = get_post_meta($post->ID, 'konzilo_id', true);
     $update = konzilo_get_post_update($post->ID);
+    if (!empty($update->sent)) {
+        return;
+    }
 
     if (empty($update)) {
       $update = array();
