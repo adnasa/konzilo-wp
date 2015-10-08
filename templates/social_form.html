@@ -12,6 +12,7 @@
       <label>
         <input type="checkbox"
                name="konzilo_channels[{{channel.id}}]"
+               data-profile="{{channel.id}}"
                {{channel_checked(update, channel.id)}}/>
         <span>{{channel.formatted_username}}</span>
       </label>
@@ -38,7 +39,7 @@
           <td>
             <input type="checkbox"
                    name="schedule[{{value.id}}][{{value.value}}]"
-                   value="{{value.value}}"
+                   value="{{value.value}}",
                    {{ value.checked}} />
           </td>
           {% endfor %}

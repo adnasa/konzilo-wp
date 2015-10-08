@@ -277,8 +277,14 @@ add_action('admin_head', 'konzilo_add_submit_metabox');
 function konzilo_submitbox_enqueue($hook) {
     if ($hook === 'post.php') {
         wp_register_script('konzilo_publishing', plugins_url( '../dist/publishing.js', __FILE__ ),
-                       array('jquery'));
+                           array('jquery', 'underscore'));
         wp_localize_script('konzilo_publishing', 'konziloPublish', konzilo_publishing_t());
+        try {
+            $queues = konzilo_get_queues();
+            wp_localize_script('konzilo_publishing', 'konziloQueues', $queues);
+        } catch(Exception $e) {
+            // ...
+        }
         wp_enqueue_script('konzilo_publishing');
     }
 }

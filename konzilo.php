@@ -601,6 +601,13 @@ class KonziloTwigExtension extends Twig_Extension {
           return 'checked';
         }
       }),
+      new Twig_SimpleFunction('selected', function ($values, $value) {
+          foreach ($values as $val) {
+              if ($val->id == $value) {
+                  return 'selected';
+              }
+          }
+      }),
       new Twig_SimpleFunction('touch_time', function ($action) {
           touch_time(($action == 'edit'), 1);
       })

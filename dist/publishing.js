@@ -1,7 +1,10 @@
-(function ($) {
+(function ($, _) {
+  'use strict';
   $(function () {
     var formVals;
     var t = window.konziloPublish;
+    var queues = window.konziloQueues;
+
     var toggleQueue = function () {
       if ($('input[name=queue_items]').attr('checked')) {
         $('.queue-settings').slideDown();
@@ -20,9 +23,32 @@
       }
     };
 
+    var QueueChanged = function () {
+      var selected = parseInt($('select[name=konzilo_queue]').val());
+      var queue = _.findWhere(queues, { id: selected});
+      if (queue) {
+        $('.socialform .channels input[type=checkbox]').each(function () {
+          var profile = parseInt($(this).attr('data-profile'));
+          if (!queue.accounts[profile] || !queue.accounts[profile].show) {
+            $(this).removeAttr('checked').parent().hide();
+          }
+          else {
+            $(this).parent().show();
+          }
+          if (queue.accounts[profile] && queue.accounts[profile].required) {
+            $(this).attr('checked', 'checked').attr('disabled', 'disabled');
+          }
+          else {
+            $(this).removeAttr('disabled');
+          }
+        });
+      }
+    }
+
+    QueueChanged();
     toggleQueue();
     toggleScheduled();
-
+    $('select[name=konzilo_queue]').change(QueueChanged);
     $('.edit-konzilo-status').click(function (e) {
       e.preventDefault();
       formVals = {
@@ -102,4 +128,4 @@
       $('select[name=post_status]').val('done');
     });
   });
-}(jQuery));
+}(jQuery, _));
