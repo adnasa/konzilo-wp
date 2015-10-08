@@ -1,10 +1,6 @@
 <?php
 function konzilo_submit_meta_box($post, $args = array() ) {
 	global $action;
-    wp_register_script('publishing', plugins_url( '../dist/publishing.js', __FILE__ ),
-                       array('jquery', 'underscore'));
-    wp_localize_script('publishing', 'konziloPublish', konzilo_publishing_t());
-    wp_enqueue_script('publishing');
 
 	$post_type = $post->post_type;
 	$post_type_object = get_post_type_object($post_type);
@@ -265,12 +261,25 @@ if ( !in_array( $post->post_status, array('publish', 'future', 'private') ) || 0
 function konzilo_add_submit_metabox() {
   if (konzilo_has_client()) {
     global $post;
-    $update = konzilo_get_post_update($post->ID);
-    if (!$update->sent) {
-      remove_meta_box('submitdiv', 'post', 'side');
-      add_meta_box('submitdiv', __('Publish'), 'konzilo_submit_meta_box', 'post', 'side', 'high');
+    if (!empty($post->ID)) {
+        $update = konzilo_get_post_update($post->ID);
+    }
+    if (empty($update->sent)) {
+        remove_meta_box('submitdiv', 'post', 'side');
+        add_meta_box('submitdiv', __('Publish'), 'konzilo_submit_meta_box', 'post', 'side', 'high');
     }
   }
 }
 
 add_action('admin_head', 'konzilo_add_submit_metabox');
+
+
+function konzilo_submitbox_enqueue($hook) {
+    if ($hook === 'post.php') {
+        wp_register_script('konzilo_publishing', plugins_url( '../dist/publishing.js', __FILE__ ),
+                       array('jquery'));
+        wp_localize_script('konzilo_publishing', 'konziloPublish', konzilo_publishing_t());
+        wp_enqueue_script('konzilo_publishing');
+    }
+}
+add_action('admin_enqueue_scripts', 'konzilo_submitbox_enqueue');

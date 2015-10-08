@@ -26,24 +26,47 @@
           {% for item in header %}
           <th>{{item.username}}</th>
           {% endfor %}
+          <th>{{'Description for entry' | t}}</th>
         </tr>
       </thead>
       <tbody>
         {% for row in schedule %}
         <tr>
 
-        <td>{{row.time}}</td>
-        {% for value in row.values%}
-        <td>
-          <input type="checkbox"
-                 name="schedule[{{value.id}}][{{value.value}}]"
-                 value="{{value.value}}"
-                 {{ value.checked}} />
-        </td>
-        {% endfor %}
+          <td>{{row.time}}</td>
+          {% for value in row.values%}
+          <td>
+            <input type="checkbox"
+                   name="schedule[{{value.id}}][{{value.value}}]"
+                   value="{{value.value}}"
+                   {{ value.checked}} />
+          </td>
+          {% endfor %}
+          <td>
+            <input type="text"
+                   name="texts[{{row.offset}}]"
+                   value="{{texts[row.offset]}}"/>
+          </td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
+    <div class="info">
+      <p>{{'You can use the shortcodes to fetch content from the entry that will be published' | t}}</p>
+      <p>{{'You can use the following shortcodes:' | t}}</p>
+      <dl>
+
+        <dt>[description]</dt>
+        <dd>{{'The description from the entry' | t}}</dd>
+      </dl>
+      <dl>
+        <dt>[title]</dt>
+        <dd>{{'The entry title' | t }}</dd>
+      </dl>
+      <dl>
+        <dt>[author]</dt>
+        <dd>{{'The entry author' | t }}</dd>
+      </dl>
+    </div>
   </div>
 </div>

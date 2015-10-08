@@ -323,9 +323,15 @@ function konzilo_save_update($post_id, $post ) {
   if (!empty($_POST['schedule'])) {
     foreach ($_POST['schedule'] as $profile => $times) {
       foreach ($times as $time) {
+          if (!empty($_POST['texts'][$time])) {
+              $text = $_POST['texts'][$time];
+          }
+          else {
+              $text = $update->text;
+          }
         $update_text = array(
           'profile' => $profile,
-          'text' => $update->text,
+          'text' => $text,
           'offset' => $time,
         );
         if (!empty($update_map[$profile . '_' . $time])) {
@@ -389,11 +395,6 @@ function konzilo_add_meta_boxes() {
   global $post;
   global $pagenow;
 
-  // Add status to the posts.
-  //wp_localize_script('social', 'socialdata', array(
-  //  'values' => array_values($meta_value),
-  //));
-  //wp_enqueue_script('social');
   add_meta_box(
     'konzilo-social-post',      // Unique ID
     esc_html__( 'Konzilo', 'konzilo' ),    // Title
@@ -463,13 +464,14 @@ function konzilo_meta_box( $object, $box ) {
   $channels = array();
 
   $updateSchedule = array();
+  $texts = array();
   foreach ($update->updates as $text) {
     if ($text->offset && $text->offset > 0) {
       $updateSchedule[$text->profile] = !empty($updateSchedule[$text->profile]) ? $updateSchedule[$text->profile] : array();
       $updateSchedule[$text->profile][$text->offset] = $text;
+      $texts[$text->offset] = $text->text;
     }
   }
-
   $header = array_map(function ($profile) use ($typeMap) {
     return array(
       'username' => $profile->formatted_username,
@@ -480,6 +482,7 @@ function konzilo_meta_box( $object, $box ) {
   $hourCheckboxes = function ($hour, $label) use ($profiles, $updateSchedule) {
     return array(
       'time' => $label,
+      'offset' => $hour * 3600,
       'values' => array_map(function ($profile) use ($hour, $updateSchedule) {
           return array(
             'value' => $hour * 3600,
@@ -507,14 +510,13 @@ function konzilo_meta_box( $object, $box ) {
   foreach ($scheme as $hour => $label) {
     $schedule[] = $hourCheckboxes($hour, $label);
   }
-
   echo $twig->render('templates/social_form.html', array(
     'update' => $update,
     'channels' => $profiles,
     'header' => $header,
-    'schedule' => $schedule
+    'schedule' => $schedule,
+    'texts' => $texts
   ));
-
 }
 
 
@@ -574,8 +576,8 @@ add_action('admin_menu', function () {
 });
 
 function konzilo_curate() {
-  wp_register_script('iframefix', plugins_url( 'dist/iframefix.js', __FILE__ ),
-                     array('jquery', 'underscore'));
+    wp_register_script('iframefix', plugins_url( 'dist/iframefix.js', __FILE__ ),
+                       array('jquery', 'underscore'));
   wp_enqueue_script('iframefix');
   print '<iframe class="curate" src="https://konzilo.kntnt.it/curate?iframe=1" style="width: 95%; margin-top: 20px; box-shadow: 2px 2px 5px rgba(0,0,0,0.26);"></iframe>';
 }
@@ -692,7 +694,7 @@ function konzilo_before_delete($post_id) {
     konzilo_delete_data('updates', $konzilo_id);
   }
   catch(Exception $e) {
-    //...ŋŋ
+    //...
   }
 }
 add_action('before_delete_post', 'konzilo_before_delete');
