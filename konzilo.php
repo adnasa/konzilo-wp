@@ -168,8 +168,6 @@ function konzilo_get_data($resource, $args = array(), $id = NULL, $params = arra
   }
   $result = wp_remote_get($uri, $args);
   if ($result['response']['code'] >= 400) {
-    echo $result['response']['body'];
-    exit();
     throw new Exception($result['response']['code']);
   }
   return json_decode($result['body']);
@@ -271,6 +269,7 @@ function konzilo_save_update($post_id, $post ) {
   if (empty($update)) {
     $update = new stdClass;
   }
+  $update->title = $_POST['post_title'];
   $update->text = $_POST['post_title'];
   $update->post_id = $post->ID;
   $update->type = $_POST['konzilo_type'];
@@ -353,7 +352,6 @@ function konzilo_save_update($post_id, $post ) {
       $update->updates[] = $new_update;
     }
   }
-
   if (!empty($update->id)) {
     $result = konzilo_put_data('updates', $update->id, array(
       'body' => $update));

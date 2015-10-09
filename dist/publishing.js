@@ -42,6 +42,10 @@
             $(this).removeAttr('disabled');
           }
         });
+        var textarea = $('.socialform textarea[name=konzilo_text]');
+        if (queue.description && textarea && textarea.val().length === 0) {
+          $('.socialform textarea[name=konzilo_text]').val(queue.description);
+        }
       }
     }
 
