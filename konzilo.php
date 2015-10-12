@@ -719,9 +719,11 @@ function konzilo_transition($new_status, $old_status, $post) {
     if ($new_status == 'published') {
       $data->type = 'now';
     }
+    file_put_contents('/tmp/konziloupdate', var_export($data, true));
     konzilo_put_data('updates', $konzilo_id, array('body' => $data));
   }
   catch(Exception $e) {
+      file_put_contents('/tmp/konziloupdate', var_export($e, true));
     //...
   }
 }

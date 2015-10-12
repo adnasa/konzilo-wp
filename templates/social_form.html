@@ -39,6 +39,7 @@
           <td>
             <input type="checkbox"
                    name="schedule[{{value.id}}][{{value.value}}]"
+                   class="offset-profile-{{value.id}}-{{value.value}} offset-profile"
                    value="{{value.value}}",
                    {{ value.checked}} />
           </td>
@@ -46,6 +47,7 @@
           <td>
             <input type="text"
                    name="texts[{{row.offset}}]"
+                   class="offset-text-{{row.offset}} offset-text"
                    value="{{texts[row.offset]}}"/>
           </td>
         </tr>

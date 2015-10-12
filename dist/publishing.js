@@ -13,6 +13,7 @@
       else {
         $('.queue-settings').slideUp();
       }
+      QueueChanged();
     };
     var toggleScheduled = function () {
       if ($('input[value=date]').attr('checked')) {
@@ -26,7 +27,8 @@
     var QueueChanged = function () {
       var selected = parseInt($('select[name=konzilo_queue]').val());
       var queue = _.findWhere(queues, { id: selected});
-      if (queue) {
+      var type = $('input[name=konzilo_type]:checked').val();
+      if (queue && (type === 'queue_first' || type === 'queue_last')) {
         $('.socialform .channels input[type=checkbox]').each(function () {
           var profile = parseInt($(this).attr('data-profile'));
           if (!queue.accounts[profile] || !queue.accounts[profile].show) {
@@ -46,9 +48,21 @@
         if (queue.description && textarea && textarea.val().length === 0) {
           $('.socialform textarea[name=konzilo_text]').val(queue.description);
         }
+        if (queue.updateTemplate && queue.updateTemplate.updates) {
+          $('.socialform .offset-text').val('');
+          $('.socialform .offset-profile').removeAttr('checked');
+          $.each(queue.updateTemplate.updates, function () {
+            if(this.offset > 0) {
+              console.log('socialform .offset-profile-' + this.profile + '-' + this.offset);
+              $('.socialform .offset-profile-' + this.profile + '-' + this.offset)
+                .attr('checked', 'checked');
+              $('.socialform .offset-text-' + this.offset)
+                .val(this.text);
+            }
+          });
+        }
       }
     }
-
     QueueChanged();
     toggleQueue();
     toggleScheduled();
@@ -108,6 +122,7 @@
       else {
         $('#timestampdiv').slideUp();
       }
+      QueueChanged();
     });
 
     $('input[name=queue_items]').change(toggleQueue);
