@@ -23,7 +23,7 @@
     <div class="queue-settings">
       <select name="konzilo_queue">
         {% for queue in queues%}
-        <option value="{{queue.id}}" {{selected(queues, post.queue)}}>{{queue.name}}</option>
+        <option value="{{queue.id}}" {{selected(queue.id, post.queue)}}>{{queue.name}}</option>
         {% endfor %}
       </select>
       <label>

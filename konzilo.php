@@ -600,11 +600,7 @@ class KonziloTwigExtension extends Twig_Extension {
         }
       }),
       new Twig_SimpleFunction('selected', function ($values, $value) {
-          foreach ($values as $val) {
-              if ($val->id == $value) {
-                  return 'selected';
-              }
-          }
+          return $values == $value;
       }),
       new Twig_SimpleFunction('touch_time', function ($action) {
           touch_time(($action == 'edit'), 1);
