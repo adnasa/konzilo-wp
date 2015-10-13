@@ -248,7 +248,7 @@ function konzilo_meta_box_setup() {
     try {
       wp_enqueue_style('social', plugins_url('css/social.css', __FILE__));
       add_action('add_meta_boxes', 'konzilo_add_meta_boxes');
-      add_action('save_post', 'konzilo_save_update', 10, 2 );
+      //      add_action('save_post', 'konzilo_save_update', 10, 2 );
     }
     catch(Exception $e) {
       // Notify the user somehow...
@@ -427,12 +427,6 @@ function konzilo_meta_box( $object, $box ) {
     echo "Konzilo isn't authorized";
     return;
   }
-
-  $typeMap = array(
-    'facebook' => 'dashicons dashicons-facebook',
-    'twitter' => 'dashicons dashicons-twitter',
-  );
-
   $base_dir = plugin_dir_path ( __FILE__ );
   $twig = konzilo_twig($base_dir, true);
   if (!$twig->hasExtension('konzilo_channel')) {
@@ -440,80 +434,14 @@ function konzilo_meta_box( $object, $box ) {
   }
   try {
     $update = konzilo_get_post_update($object->ID);
-    $profiles = konzilo_get_data('profiles');
   }
   catch (Exception $e) {
     return;
     // We need to deal with these things in some way.
   }
-  if (empty($update)) {
-    $update = (object)array(
-      'text' => '',
-      'updates' => array()
-    );
-    foreach ($profiles as $profile) {
-      $update->updates[] = (object)array(
-        'profile' => $profile->id,
-        'text' => $update->text,
-        'offset' => 0,
-      );
-    }
-  }
-  $channels = array();
-
-  $updateSchedule = array();
-  $texts = array();
-  foreach ($update->updates as $text) {
-    if ($text->offset && $text->offset > 0) {
-      $updateSchedule[$text->profile] = !empty($updateSchedule[$text->profile]) ? $updateSchedule[$text->profile] : array();
-      $updateSchedule[$text->profile][$text->offset] = $text;
-      $texts[$text->offset] = $text->text;
-    }
-  }
-  $header = array_map(function ($profile) use ($typeMap) {
-    return array(
-      'username' => $profile->formatted_username,
-      'service' => $profile->service
-    );
-  }, $profiles);
-
-  $hourCheckboxes = function ($hour, $label) use ($profiles, $updateSchedule) {
-    return array(
-      'time' => $label,
-      'offset' => $hour * 3600,
-      'values' => array_map(function ($profile) use ($hour, $updateSchedule) {
-          return array(
-            'value' => $hour * 3600,
-            'id' => $profile->id,
-            'checked' => !empty($updateSchedule[$profile->id][$hour * 3600]) ?
-            'checked' : ''
-          );
-        }, $profiles)
-    );
-  };
-
-  $scheme = array(
-    2 => __('+ 2 hours', 'konzilo'),
-    4 => __('+ 4 hours', 'konzilo'),
-    8 => __('+ 8 hours', 'konzilo'),
-    16 => __('+ 16 hours', 'konzilo'),
-    32 => __('+ 32 hours', 'konzilo'),
-    64 => __('+ 64 hours', 'konzilo'),
-    128 => __('+ 128 hours', 'konzilo')
-  );
-
-
-  $schedule = array();
-
-  foreach ($scheme as $hour => $label) {
-    $schedule[] = $hourCheckboxes($hour, $label);
-  }
   echo $twig->render('templates/social_form.html', array(
     'update' => $update,
-    'channels' => $profiles,
-    'header' => $header,
-    'schedule' => $schedule,
-    'texts' => $texts
+    'konzilo_url' => KONZILO_URL
   ));
 }
 
@@ -715,11 +643,9 @@ function konzilo_transition($new_status, $old_status, $post) {
     if ($new_status == 'published') {
       $data->type = 'now';
     }
-    file_put_contents('/tmp/konziloupdate', var_export($data, true));
     konzilo_put_data('updates', $konzilo_id, array('body' => $data));
   }
   catch(Exception $e) {
-      file_put_contents('/tmp/konziloupdate', var_export($e, true));
     //...
   }
 }

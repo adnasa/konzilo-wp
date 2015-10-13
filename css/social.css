@@ -207,10 +207,10 @@ a.remove-box {
 
 #konzilo-status-select .queue-settings label {
     padding: 7px 0;
-}    
+}
 
 label[for=konzilo-status] {
-    
+
 }
 
 label[for=konzilo-status]:before {
@@ -254,7 +254,7 @@ label[for=konzilo-status]:before {
     margin: 0;
     padding: 0;
     margin-right: 10px;
-    
+
 }
 
 .socialform .tabs li a.active {
@@ -296,4 +296,10 @@ label[for=konzilo-status]:before {
 #konzilo-status-select .save-timestamp,
 #konzilo-status-select .cancel-timestamp {
     display: none;
+}
+
+#konzilo-iframe {
+    width: 100%;
+    max-width: 600px;
+    height: 300px;
 }

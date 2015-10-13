@@ -5,15 +5,29 @@
     var t = window.konziloPublish;
     var queues = window.konziloQueues;
 
+    var sendMessage = function (msg) {
+      var iframe = $('#konzilo-iframe');
+      if (iframe.length === 0) {
+        return;
+      }
+      iframe[0].contentWindow.postMessage(msg, '*');
+    }
+
     var toggleQueue = function () {
       if ($('input[name=queue_items]').attr('checked')) {
         $('.queue-settings').slideDown();
         $('input[value=queue_last]').attr('checked', 'checked');
+        var queue = $('select[name=konzilo_queue]').val();
+        sendMessage({
+          type: 'queueChanged',
+          msg: queue,
+          queueType: 'queue_last'
+        });
+
       }
       else {
         $('.queue-settings').slideUp();
       }
-      QueueChanged();
     };
     var toggleScheduled = function () {
       if ($('input[value=date]').attr('checked')) {
@@ -24,49 +38,9 @@
       }
     };
 
-    var QueueChanged = function () {
-      var selected = parseInt($('select[name=konzilo_queue]').val());
-      var queue = _.findWhere(queues, { id: selected});
-      var type = $('input[name=konzilo_type]:checked').val();
-      if (queue && (type === 'queue_first' || type === 'queue_last')) {
-        $('.socialform .channels input[type=checkbox]').each(function () {
-          var profile = parseInt($(this).attr('data-profile'));
-          if (!queue.accounts[profile] || !queue.accounts[profile].show) {
-            $(this).removeAttr('checked').parent().hide();
-          }
-          else {
-            $(this).parent().show();
-          }
-          if (queue.accounts[profile] && queue.accounts[profile].required) {
-            $(this).attr('checked', 'checked').attr('disabled', 'disabled');
-          }
-          else {
-            $(this).removeAttr('disabled');
-          }
-        });
-        var textarea = $('.socialform textarea[name=konzilo_text]');
-        if (queue.description && textarea && textarea.val().length === 0) {
-          $('.socialform textarea[name=konzilo_text]').val(queue.description);
-        }
-        if (queue.updateTemplate && queue.updateTemplate.updates) {
-          $('.socialform .offset-text').val('');
-          $('.socialform .offset-profile').removeAttr('checked');
-          $.each(queue.updateTemplate.updates, function () {
-            if(this.offset > 0) {
-              console.log('socialform .offset-profile-' + this.profile + '-' + this.offset);
-              $('.socialform .offset-profile-' + this.profile + '-' + this.offset)
-                .attr('checked', 'checked');
-              $('.socialform .offset-text-' + this.offset)
-                .val(this.text);
-            }
-          });
-        }
-      }
-    }
-    QueueChanged();
     toggleQueue();
     toggleScheduled();
-    $('select[name=konzilo_queue]').change(QueueChanged);
+
     $('.edit-konzilo-status').click(function (e) {
       e.preventDefault();
       formVals = {
@@ -122,7 +96,20 @@
       else {
         $('#timestampdiv').slideUp();
       }
-      QueueChanged();
+      sendMessage({
+        type: 'typeChanged',
+        msg: type
+      });
+    });
+
+    $('select[name=konzilo_queue]').change(function () {
+      var queue = $(this).val();
+      var type = $('input[name=konzilo_type]:checked').val();
+      sendMessage({
+        type: 'queueChanged',
+        msg: queue,
+        queueType: type
+      });
     });
 
     $('input[name=queue_items]').change(toggleQueue);
@@ -145,6 +132,12 @@
 
     $('input[name=ready_for_publishing]').click(function() {
       $('select[name=post_status]').val('done');
+    });
+
+    $('form#post').submit(function(e) {
+      sendMessage({
+        type: 'saveUpdate'
+      });
     });
   });
 }(jQuery, _));
