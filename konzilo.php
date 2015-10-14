@@ -19,6 +19,24 @@ if (   file_exists( $composer_autoload = __DIR__ . '/vendor/autoload.php' ) /* c
   require_once $composer_autoload;
 }
 
+class KonziloError extends Exception {
+    private $status;
+    private $body;
+    function __construct($message, $status, $body) {
+        parent::__construct($message);
+        $this->status = $status;
+        $this->body = $body;
+    }
+
+    function getBody() {
+        return $this->body;
+    }
+
+    function getStatus() {
+        return $this->status;
+    }
+}
+
 // Default konzilo location.
 if (!defined('KONZILO_URL')) {
   define('KONZILO_URL', 'https://app.konzilo.com');
@@ -97,7 +115,11 @@ function konzilo_get_token($url, $client_id, $client_secret, $redirect_uri, $sta
   );
   $result = wp_remote_post($oauth_url, $args);
   if ($result['response']['code'] > 399) {
-    throw new Exception("Authorization failed");
+      throw new KonziloError(
+          "Authorization failed",
+          $result['response']['code'],
+          $result['body']
+      );
   }
   $codes = json_decode($result['body']);
   $update = $local ? 'update_option' : 'update_site_option';
@@ -132,7 +154,11 @@ function konzilo_refresh_token() {
     throw new Exception($result->get_error_message());
   }
   if (is_object($result) || $result['response']['code'] > 399) {
-    throw new Exception($result['response']['code']);
+    throw new KonziloError(
+        'Could not refreesh token',
+        $result['response']['code'],
+        $result['response']['body']
+    );
   }
   $codes = json_decode($result['body']);
   $set('konzilo_refresh_token', $codes->refresh_token);
@@ -168,7 +194,11 @@ function konzilo_get_data($resource, $args = array(), $id = NULL, $params = arra
   }
   $result = wp_remote_get($uri, $args);
   if ($result['response']['code'] >= 400) {
-    throw new Exception($result['response']['code']);
+      throw new KonziloError(
+          'Could not get data from konzilo',
+          $result['response']['code'],
+          $result['response']['body']
+      );
   }
   return json_decode($result['body']);
 }
@@ -187,8 +217,11 @@ function konzilo_post_data($resource, $args = array(), $id = null) {
   }
   $result = wp_remote_post($uri, $args);
   if ($result['response']['code'] >= 400) {
-    print $result['body'];
-    throw new Exception($result['response']['code']);
+      throw new KonziloError(
+          'Could not post data to konzilo',
+          $result['response']['code'],
+          $result['body']
+      );
   }
   return json_decode($result['body']);
 }
@@ -246,9 +279,9 @@ add_action('load-post-new.php', 'konzilo_meta_box_setup');
 function konzilo_meta_box_setup() {
   if (konzilo_has_client()) {
     try {
-      wp_enqueue_style('social', plugins_url('css/social.css', __FILE__));
-      add_action('add_meta_boxes', 'konzilo_add_meta_boxes');
-      //      add_action('save_post', 'konzilo_save_update', 10, 2 );
+            wp_enqueue_style('social', plugins_url('css/social.css', __FILE__));
+            add_action('add_meta_boxes', 'konzilo_add_meta_boxes');
+            add_action('save_post', 'konzilo_save_update', 10, 2 );
     }
     catch(Exception $e) {
       // Notify the user somehow...
@@ -278,90 +311,42 @@ function konzilo_save_update($post_id, $post ) {
   }
   $update->status = $_POST['post_status'];
   $update->link = get_permalink($post_id);
-  $update->updates = array();
-
-  if ($update->type == 'date') {
-    $time = $_POST['aa'] .
-          '-' . $_POST['mm'] .
-          '-' .
-          $_POST['jj'] . 'T' .
-          $_POST['hh'] . ':' .
-          $_POST['mn'] . ':' .
-          $_POST['ss'] . '+' .
-          '0'  . get_option('gmt_offset') . ':00';
-
-    $update->scheduled_at = strtotime($time);
-    $update->scheduled_at = date('c', $update->scheduled_at);
-  }
-  if (empty($update->organisation)) {
-    $org = get_option('konzilocustom_organisation');
-    if (!empty($org)) {
-      $update->organisation = $org;
-    }
-
-    $site = get_option('konzilocustom_site');
-    $update->site = !empty($site) ? $site : NULL;
-  }
-  if (!empty($_POST['konzilo_text'])) {
-    $update->text = $_POST['konzilo_text'];
-  }
-  $update_map = array();
-  $update_offset_map = array();
-  $schedule_map = array();
-  foreach ($update->updates as $text) {
-    if ($text->offset == 0) {
-      $update_map[$text->profile] = $text;
-    }
-    else {
-      $update_map[$text->profile . '_' . $text->offset] = $text;
-    }
-  }
-  $old_updates = $update->updates;
-  $update->updates = array();
-
-  if (!empty($_POST['schedule'])) {
-    foreach ($_POST['schedule'] as $profile => $times) {
-      foreach ($times as $time) {
-          if (!empty($_POST['texts'][$time])) {
-              $text = $_POST['texts'][$time];
-          }
-          else {
-              $text = $update->text;
-          }
-        $update_text = array(
-          'profile' => $profile,
-          'text' => $text,
-          'offset' => $time,
-        );
-        if (!empty($update_map[$profile . '_' . $time])) {
-          $update_text->id = $update_map[$profile . '_' . $time]->id;
-        }
-        $update->updates[] = $update_text;
+  try {
+      if (!empty($update->id)) {
+          $result = konzilo_put_data('updates', $update->id, array(
+              'body' => $update));
       }
-    }
-  }
-  if (!empty($_POST['konzilo_channels'])) {
-    foreach ($_POST['konzilo_channels'] as $key => $val) {
-      $new_update = (object)array(
-        'profile' => $key,
-        'text' => $update->text,
-      );
-      if (isset($update_map[$val])) {
-        $new_update->id = $update_map[$val]->id;
+      else {
+          $result = konzilo_post_data('updates', array(
+              'body' => $update));
+          update_post_meta($post_id, 'konzilo_id', $result->id);
       }
-      $update->updates[] = $new_update;
-    }
   }
-  if (!empty($update->id)) {
-    $result = konzilo_put_data('updates', $update->id, array(
-      'body' => $update));
-  }
-  else {
-    $result = konzilo_post_data('updates', array(
-      'body' => $update));
-    update_post_meta($post_id, 'konzilo_id', $result->id);
+  catch (Exception $e) {
+      konzilo_log(__('Something went wrong when saving your post to konzilo.' .
+                     ' Check your <a href="' .
+                     admin_url('options-general.php?page=konzilo_auth_settings') .
+                     '">Konzilo settings.</a>', 'konzilo'));
+      // ...
   }
 }
+
+function konzilo_log($error) {
+    $log = get_option('konzilo_log', array());
+    $log[] = $error;
+    update_option('konzilo_log', $log);
+}
+
+function konzilo_admin_notices() {
+    $log = get_option('konzilo_log', array());
+    foreach ($log as $message) {
+        echo '<div class="notice notice-error is-dismissable"><p>' . $message . '</p></div>';
+    }
+    if (!empty($log)) {
+        update_option('konzilo_log', array());
+    }
+}
+add_action('admin_notices', 'konzilo_admin_notices');
 
 function konzilo_create_none_settings($action, $name) {
   $name = esc_attr( $name );
@@ -392,15 +377,23 @@ function konzilo_indexby($key, $arr) {
 function konzilo_add_meta_boxes() {
   global $post;
   global $pagenow;
+  global $post;
+  try {
+  if (konzilo_get_post_update($post->ID)) {
 
-  add_meta_box(
-    'konzilo-social-post',      // Unique ID
-    esc_html__( 'Konzilo', 'konzilo' ),    // Title
-    'konzilo_meta_box',   // Callback function
-    'post',         // Admin page (or post type)
-    'normal',         // Context
-    'high'         // Priority
-  );
+      add_meta_box(
+          'konzilo-social-post',      // Unique ID
+          esc_html__( 'Konzilo', 'konzilo' ),    // Title
+          'konzilo_meta_box',   // Callback function
+          'post',         // Admin page (or post type)
+          'normal',         // Context
+          'high'         // Priority
+      );
+  }
+  }
+  catch (Exception $e) {
+      // ...
+  }
 }
 
 class KonziloChannelExtension extends Twig_Extension {
