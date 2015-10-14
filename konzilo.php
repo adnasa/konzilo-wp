@@ -299,9 +299,10 @@ function konzilo_save_update($post_id, $post ) {
   }
   catch (Exception $e) {}
 
-  if (empty($update)) {
-    $update = new stdClass;
+  if (!empty($update)) {
+      return;
   }
+  $update = new stdClass;
   $update->title = $_POST['post_title'];
   $update->text = $_POST['post_title'];
   $update->post_id = $post->ID;
