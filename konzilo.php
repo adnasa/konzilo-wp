@@ -197,7 +197,7 @@ function konzilo_get_data($resource, $args = array(), $id = NULL, $params = arra
       throw new KonziloError(
           'Could not get data from konzilo',
           $result['response']['code'],
-          $result['response']['body']
+          $result['body']
       );
   }
   return json_decode($result['body']);
@@ -548,8 +548,9 @@ function konzilo_submit_actions() {
       $update = array();
       if (!empty($queues)) {
         $update['type'] = 'queue_last';
-        $update['queue'] = $queues[0]->id;
-        $konzilo_status = __('Last in', 'konzilo') . ' ' . $queues[0]->name;
+        $queue = $queues[0];
+        $update['queue'] = $queue->id;
+        $konzilo_status = __('Last in', 'konzilo') . ' ' . $queue->name;
       }
       else {
         $update['type'] = 'stored';
