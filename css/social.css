@@ -300,6 +300,6 @@ label[for=konzilo-status]:before {
 
 #konzilo-iframe {
     width: 100%;
-    max-width: 600px;
+    overflow: hidden;
     height: 300px;
 }

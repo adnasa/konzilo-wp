@@ -264,14 +264,15 @@ function konzilo_add_submit_metabox() {
     if (!empty($post->ID)) {
         $update = konzilo_get_post_update($post->ID);
     }
-    if (empty($update->sent)) {
+    if (empty($update) || (empty($update->sent) && $update->type != 'now'
+                           && $post->post_status != 'publish')) {
         remove_meta_box('submitdiv', 'post', 'side');
         add_meta_box('submitdiv', __('Publish'), 'konzilo_submit_meta_box', 'post', 'side', 'high');
     }
   }
 }
 
-add_action('admin_head', 'konzilo_add_submit_metabox');
+add_action('add_meta_boxes', 'konzilo_add_submit_metabox');
 
 
 function konzilo_submitbox_enqueue($hook) {

@@ -133,11 +133,28 @@
     $('input[name=ready_for_publishing]').click(function() {
       $('select[name=post_status]').val('done');
     });
+    var sent = false;
+    var listener = function (e) {
+      if (e.data === 'saved') {
+        sent = true;
+        $('form#post').submit();
+      }
+      if (e.data && e.data.type === 'height') {
+        $('#konzilo-iframe').height(e.data.height);
+      }
+    }
+    window.addEventListener('message', listener);
 
     $('form#post').submit(function(e) {
-      sendMessage({
-        type: 'saveUpdate'
-      });
+      if (!sent) {
+        e.preventDefault();
+        sendMessage({
+          type: 'saveUpdate'
+        });
+      }
+      else {
+        sent = false;
+      }
     });
   });
 }(jQuery, _));

@@ -299,19 +299,24 @@ function konzilo_save_update($post_id, $post ) {
   }
   catch (Exception $e) {}
 
-  if (!empty($update)) {
-      return;
+  if (empty($update)) {
+      $update = new stdClass;
   }
-  $update = new stdClass;
   $update->title = $_POST['post_title'];
-  $update->text = $_POST['post_title'];
   $update->post_id = $post->ID;
+  $old_type = $update->type;
   $update->type = $_POST['konzilo_type'];
-  if (!empty($_POST['konzilo_queue'])) {
+  if (!empty($_POST['konzilo_queue'])
+      && $update->type == 'queue_last' || $update->type == 'queue_first') {
+
     $update->queue = $_POST['konzilo_queue'];
+    // Lets get the defaults from the list.
+    konzilo_log($_POST['konzilo_queue']);
+    unset($update->updates);
   }
   $update->status = $_POST['post_status'];
   $update->link = get_permalink($post_id);
+
   try {
       if (!empty($update->id)) {
           $result = konzilo_put_data('updates', $update->id, array(
@@ -328,6 +333,7 @@ function konzilo_save_update($post_id, $post ) {
                      ' Check your <a href="' .
                      admin_url('options-general.php?page=konzilo_auth_settings') .
                      '">Konzilo settings.</a>', 'konzilo'));
+      konzilo_log($e->getBody());
       // ...
   }
 }
@@ -380,9 +386,9 @@ function konzilo_add_meta_boxes() {
   global $pagenow;
   global $post;
   try {
-  if (konzilo_get_post_update($post->ID)) {
-
-      add_meta_box(
+      $update = konzilo_get_post_update($post->ID);
+      if ($post->post_status != 'publish' && (!empty($update) && $update->type != 'now')) {
+          add_meta_box(
           'konzilo-social-post',      // Unique ID
           esc_html__( 'Konzilo', 'konzilo' ),    // Title
           'konzilo_meta_box',   // Callback function
@@ -433,6 +439,7 @@ function konzilo_meta_box( $object, $box ) {
     return;
     // We need to deal with these things in some way.
   }
+
   echo $twig->render('templates/social_form.html', array(
     'update' => $update,
     'konzilo_url' => KONZILO_URL
@@ -541,7 +548,7 @@ function konzilo_submit_actions() {
     $queues = konzilo_get_queues();
     $konzilo_id = get_post_meta($post->ID, 'konzilo_id', true);
     $update = konzilo_get_post_update($post->ID);
-    if (!empty($update->sent)) {
+    if ($post->post_status == 'publish' || (!empty($update) && (!empty($update->sent) || $update->type == 'now'))) {
         return;
     }
 
@@ -594,7 +601,8 @@ function konzilo_submit_actions() {
       'has_queues' => !empty($queues),
       'post' => $update,
       'konzilo_status' => $konzilo_status,
-      'action' => $action
+      'action' => $action,
+      'change_status' => empty($update->id) || ($update->type != 'queue_last' && $update->type != 'queue_first')
     );
     $base_dir = plugin_dir_path ( __FILE__ );
     $twig = konzilo_twig($base_dir);

@@ -11,11 +11,12 @@
     </span>
   </a>
   <div id="konzilo-status-select" class="hide-if-js">
+
     <label><input type="radio" name="konzilo_type"
                   value="stored" {{checked(post, 'stored')}} />
       <span>{{__('Park')}}</span>
     </label>
-    {% if has_queues %}
+    {% if has_queues and change_status %}
     <label>
       <input type="radio" name="queue_items" value="queue" {{checked(post, ['queue_last', 'queue_first'])}} />
       <span>{{__('Publish list')}}</span>
@@ -52,6 +53,5 @@
 
     <a href="#konzilo-post-status" class="save-konzilo-status hide-if-no-js button">{{'OK' | t}}</a>
     <a href="#konzilo-post-status" class="cancel-konzilo-status hide-if-no-js button-cancel">{{'Cancel' | t}}</a>
-
   </div>
 </div>
