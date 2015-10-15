@@ -129,7 +129,9 @@
       $('.socialform .schedule').show();
       $('.socialform .content-form').hide();
     });
-
+    if ($('#konzilo-iframe').length === 0) {
+      return;
+    }
     $('input[name=ready_for_publishing]').click(function() {
       $('select[name=post_status]').val('done');
     });
