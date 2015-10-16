@@ -290,7 +290,9 @@ function konzilo_meta_box_setup() {
 }
 
 function konzilo_save_update($post_id, $post ) {
+
   $post_type = get_post_type_object( $post->post_type );
+  konzilo_log(print_r($post, true));
   /* Check if the current user has permission to edit the post.*/
   if ( !current_user_can( $post_type->cap->edit_post, $post_id ) || !isset($_POST['konzilo_type']))
     return $post_id;
@@ -298,11 +300,11 @@ function konzilo_save_update($post_id, $post ) {
     $update = konzilo_get_post_update($post->ID);
   }
   catch (Exception $e) {}
-
   if (empty($update)) {
       $update = new stdClass;
   }
-  $update->title = $_POST['post_title'];
+
+  $update->title = strip_tags($post->post_title);
   $update->post_id = $post->ID;
   $old_type = $update->type;
   $update->type = $_POST['konzilo_type'];
@@ -337,7 +339,6 @@ function konzilo_save_update($post_id, $post ) {
                      ' Check your <a href="' .
                      admin_url('options-general.php?page=konzilo_auth_settings') .
                      '">Konzilo settings.</a>', 'konzilo'));
-      konzilo_log($e->getBody());
       // ...
   }
 }
