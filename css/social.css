@@ -303,3 +303,17 @@ label[for=konzilo-status]:before {
     overflow: hidden;
     height: 300px;
 }
+
+#konzilo-status-select #timestampdiv .timestamp-wrap {
+    display: flex;
+}
+
+#konzilo-status-select #timestampdiv .timestamp-wrap label {
+    margin-right: 5px;
+}
+
+#konzilo-status-select #timestampdiv .timestamp-wrap label:nth-child(3),
+#konzilo-status-select #timestampdiv .timestamp-wrap label:nth-child(4),
+#konzilo-status-select #timestampdiv .timestamp-wrap label:nth-child(5) {
+    margin-left: 5px;
+}

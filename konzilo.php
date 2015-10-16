@@ -311,12 +311,16 @@ function konzilo_save_update($post_id, $post ) {
 
     $update->queue = $_POST['konzilo_queue'];
     // Lets get the defaults from the list.
-    konzilo_log($_POST['konzilo_queue']);
     unset($update->updates);
   }
   $update->status = $_POST['post_status'];
   $update->link = get_permalink($post_id);
-
+  if ($_POST['konzilo_type'] == 'date') {
+      $time = strtotime($_POST['aa'] . '-' . $_POST['mm']
+                        . '-' . $_POST['jj'] . ' ' . $_POST['hh']
+                        . ':' . $_POST['mn']);
+      $update->scheduled_at = date('c', $time);
+  }
   try {
       if (!empty($update->id)) {
           $result = konzilo_put_data('updates', $update->id, array(
@@ -576,11 +580,13 @@ function konzilo_submit_actions() {
         break;
 
       case 'date':
-        $default = date_default_timezone_get();
-        date_default_timezone_set(get_option('timezone_string'));
-        $konzilo_status = __('Scheduled at:', 'konzilo') . ' ' .
-                        date('Y-m-d H:i', strtotime($update->scheduled_at));
-        date_default_timezone_set($default);
+          $default = date_default_timezone_get();
+          if (!empty(get_option('timezone_string'))) {
+              date_default_timezone_set(get_option('timezone_string'));
+          }
+          $konzilo_status = __('Scheduled at:', 'konzilo') . ' ' .
+                          date('Y-m-d H:i', strtotime($update->scheduled_at));
+          date_default_timezone_set($default);
         break;
 
       default:
