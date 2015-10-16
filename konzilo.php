@@ -292,7 +292,6 @@ function konzilo_meta_box_setup() {
 function konzilo_save_update($post_id, $post ) {
 
   $post_type = get_post_type_object( $post->post_type );
-  konzilo_log(print_r($post, true));
   /* Check if the current user has permission to edit the post.*/
   if ( !current_user_can( $post_type->cap->edit_post, $post_id ) || !isset($_POST['konzilo_type']))
     return $post_id;
