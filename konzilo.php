@@ -493,15 +493,6 @@ function konzilo_translate_codes($subject, $post) {
   return $subject;
 }
 
-function konzilo_publish($id) {
-    if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-        $social_updates = get_post_meta( $id, 'konzilo_post', true);
-        konzilo_post_updates($id, $social_updates);
-    }
-}
-add_action( 'publish_post', 'konzilo_publish');
-
-
 add_action('admin_menu', function () {
   add_menu_page(__('Curate content', 'konzilo'), 'Curate content', 'publish_posts', 'curate_content', 'konzilo_curate');
 });
