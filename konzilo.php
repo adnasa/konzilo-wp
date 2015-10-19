@@ -317,10 +317,16 @@ function konzilo_save_update($post_id, $post ) {
   $update->status = $_POST['post_status'];
   $update->link = get_permalink($post_id);
   if ($_POST['konzilo_type'] == 'date') {
+      $default = date_default_timezone_get();
+      if (!empty(get_option('timezone_string'))) {
+          date_default_timezone_set(get_option('timezone_string'));
+      }
+
       $time = strtotime($_POST['aa'] . '-' . $_POST['mm']
                         . '-' . $_POST['jj'] . ' ' . $_POST['hh']
                         . ':' . $_POST['mn']);
       $update->scheduled_at = date('c', $time);
+      date_default_timezone_set($default);
   }
   try {
       if (!empty($update->id)) {
