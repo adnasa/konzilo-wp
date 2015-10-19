@@ -154,10 +154,10 @@ function konzilo_refresh_token() {
     throw new Exception($result->get_error_message());
   }
   if (is_object($result) || $result['response']['code'] > 399) {
-    throw new KonziloError(
+      throw new KonziloError(
         'Could not refreesh token',
         $result['response']['code'],
-        $result['response']['body']
+        $result['body']
     );
   }
   $codes = json_decode($result['body']);
@@ -194,6 +194,7 @@ function konzilo_get_data($resource, $args = array(), $id = NULL, $params = arra
   }
   $result = wp_remote_get($uri, $args);
   if ($result['response']['code'] >= 400) {
+      konzilo_log($result['body']);
       throw new KonziloError(
           'Could not get data from konzilo',
           $result['response']['code'],
@@ -217,6 +218,7 @@ function konzilo_post_data($resource, $args = array(), $id = null) {
   }
   $result = wp_remote_post($uri, $args);
   if ($result['response']['code'] >= 400) {
+      konzilo_log($result['body']);
       throw new KonziloError(
           'Could not post data to konzilo',
           $result['response']['code'],
@@ -305,6 +307,8 @@ function konzilo_save_update($post_id, $post ) {
 
   $update->title = strip_tags($post->post_title);
   $update->post_id = $post->ID;
+  $update->organisation = get_option('konzilocustom_organisation');
+  $update->site = get_option('konzilocustom_site');
   $old_type = $update->type;
   $update->type = $_POST['konzilo_type'];
   if (!empty($_POST['konzilo_queue'])
@@ -315,6 +319,7 @@ function konzilo_save_update($post_id, $post ) {
     unset($update->updates);
   }
   $update->status = $_POST['post_status'];
+
   $update->link = get_permalink($post_id);
   if ($_POST['konzilo_type'] == 'date') {
       $default = date_default_timezone_get();
