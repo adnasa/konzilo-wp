@@ -307,8 +307,14 @@ function konzilo_save_update($post_id, $post ) {
 
   $update->title = strip_tags($post->post_title);
   $update->post_id = $post->ID;
-  $update->organisation = get_option('konzilocustom_organisation');
-  $update->site = get_option('konzilocustom_site');
+  $organisation = get_option('konzilocustom_organisation');
+  $site = get_option('konzilocustom_site');
+  if (!empty($organisation)) {
+      $update->organisation = $organisation;
+  }
+  if (!empty($site)) {
+      $update->site = $site;
+  }
   $old_type = $update->type;
   $update->type = $_POST['konzilo_type'];
   if (!empty($_POST['konzilo_queue'])
