@@ -142,7 +142,7 @@
         $('form#post').submit();
       }
       if (e.data && e.data.type === 'height') {
-        $('#konzilo-iframe').height(e.data.height);
+        $('#konzilo-iframe').height(e.data.height + 40);
       }
     }
     window.addEventListener('message', listener);
