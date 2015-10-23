@@ -79,6 +79,12 @@
       case 'queue_first':
         label.html(t.firstin + ' ' + queue);
         break;
+      case 'date':
+        var date = $('#aa').val() + '-' + $('#mm').val() + '-' + $('#jj').val()
+          + ' ' + $('#hh').val() + ':' + $('#mn').val();
+        label.html(t.scheduled + ' ' + date);
+        break;
+
       }
       $('#konzilo-status-select').slideUp();
       $('.edit-konzilo-status').show();

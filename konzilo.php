@@ -718,6 +718,7 @@ function konzilo_publishing_t() {
     'firstin'=>  __('First in', 'konzilo'),
     'parked' => __('Parked', 'konzilo'),
     'publishnow' => __('Publish now', 'konzilo'),
+    'scheduled' =>__('Scheduled at:', 'konzilo')
   );
 }
 
