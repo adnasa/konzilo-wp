@@ -514,17 +514,6 @@ function konzilo_translate_codes($subject, $post) {
   return $subject;
 }
 
-add_action('admin_menu', function () {
-  add_menu_page(__('Curate content', 'konzilo'), 'Curate content', 'publish_posts', 'curate_content', 'konzilo_curate');
-});
-
-function konzilo_curate() {
-    wp_register_script('iframefix', plugins_url( 'dist/iframefix.js', __FILE__ ),
-                       array('jquery', 'underscore'));
-  wp_enqueue_script('iframefix');
-  print '<iframe class="curate" src="https://konzilo.kntnt.it/curate?iframe=1" style="width: 95%; margin-top: 20px; box-shadow: 2px 2px 5px rgba(0,0,0,0.26);"></iframe>';
-}
-
 function konzilo_get_queues() {
   return konzilo_get_data('queues');
 }
