@@ -193,8 +193,12 @@ function konzilo_get_data($resource, $args = array(), $id = NULL, $params = arra
     $uri .= implode('&', $parts);
   }
   $result = wp_remote_get($uri, $args);
+  if ($result instanceof WP_Error) {
+      konzilo_log($result);
+      throw $result;
+  }
   if ($result['response']['code'] >= 400) {
-      konzilo_log($result['body']);
+      //konzilo_log($result['body']);
       throw new KonziloError(
           'Could not get data from konzilo',
           $result['response']['code'],
@@ -218,7 +222,7 @@ function konzilo_post_data($resource, $args = array(), $id = null) {
   }
   $result = wp_remote_post($uri, $args);
   if ($result['response']['code'] >= 400) {
-      konzilo_log($result['body']);
+      //konzilo_log($result['body']);
       throw new KonziloError(
           'Could not post data to konzilo',
           $result['response']['code'],
