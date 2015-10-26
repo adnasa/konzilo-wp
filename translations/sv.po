@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: konzilo\n"
-"POT-Creation-Date: 2015-10-25 18:38+0100\n"
-"PO-Revision-Date: 2015-10-25 18:39+0100\n"
+"POT-Creation-Date: 2015-10-26 12:42+0100\n"
+"PO-Revision-Date: 2015-10-26 12:44+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: sv\n"
@@ -30,192 +30,284 @@ msgstr "Konzilo"
 msgid "Authorization complete"
 msgstr "Auktorisering klar"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:358
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:359
 msgid ""
 "Something went wrong when saving your post to konzilo. Check your <a href=\""
 msgstr ""
 "Något blev fel när din post skulle sparas i konzilo. Kontrollera dina <a "
 "href=\""
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:566
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:717
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:567
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:719
 msgid "Last in"
 msgstr "Sist i"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:570
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:580
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:719
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:571
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:581
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:721
 msgid "Parked"
 msgstr "Parkerad"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:576
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:706
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:720
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:734
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:577
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:708
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:722
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:736
 msgid "Publish now"
 msgstr "Publicera nu"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:588
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:709
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:721
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:590
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:711
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:723
 msgid "Scheduled at:"
 msgstr "Schemalagd:"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:601
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:603
 msgid "In"
 msgstr "i"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:679
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:681
 msgid "Queue"
 msgstr "Kö"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:680
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:682
 msgid "Days"
 msgstr "Dagar"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:681
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:683
 msgid "Monday"
 msgstr "Måndag"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:682
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:684
 msgid "Tuesday"
 msgstr "Tisdag"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:683
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:685
 msgid "Wednesday"
 msgstr "Onsdag"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:684
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:686
 msgid "Thursday"
 msgstr "Torsdag"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:685
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:687
 msgid "Friday"
 msgstr "Fredag"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:686
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:688
 msgid "Saturday"
 msgstr "Lördag"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:687
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:689
 msgid "Sunday"
 msgstr "Söndag"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:688
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:690
 msgid "Posting times"
 msgstr "Publiceringstider"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:689
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:691
 msgid "Remove"
 msgstr "Ta bort"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:690
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:692
 msgid "Add posting time"
 msgstr "Lägg till publiceringstid"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:691
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:693
 msgid "Save queue"
 msgstr "Spara kö"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:692
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:694
 msgid "Create new queue"
 msgstr "Skapa ny kö"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:693
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:695
 msgid "Create queue"
 msgstr "Skapa kö"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:694
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:696
 msgid "Name"
 msgstr "Namn"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:695
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:697
 msgid "Default settings for social media"
 msgstr "Standardinställningar för social media"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:696
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:698
 msgid "Save defaults"
 msgstr "Spara standardinställningar"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:697
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:699
 msgid "Queue settings"
 msgstr "Kö-inställningar"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:698
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:700
 msgid "All days"
 msgstr "Alla dagar"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:704
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:706
 msgid "Add profile"
 msgstr "Lägg till profil"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:705
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:707
 msgid "You can use the following shortcodes:"
 msgstr "Du kan använda förljande kortkoder:"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:707
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:709
 msgid "First in queue"
 msgstr "Först i kö"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:708
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:710
 msgid "Last in queue"
 msgstr "Sist i kö"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:710
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:712
 msgid "Add another update"
 msgstr "Läg till en till uppdatering"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:711
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:713
 msgid "Sent at:"
 msgstr "Skickat:"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:718
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:720
 msgid "First in"
 msgstr "Först i"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:727
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:729
 msgid "Publishing:"
 msgstr "Publicering:"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:728
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:730
 msgid "Edit"
 msgstr "Redigera"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:729
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:731
 msgid "Edit status"
 msgstr "Redigera status"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:730
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:732
 msgid "Park"
 msgstr "Parkera"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:731
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:733
 msgid "Publish list"
 msgstr "Publiceringslista"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:732
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:734
 msgid "Put last in queue"
 msgstr "Lägg sist i kön"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:733
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:735
 msgid "Put first in queue"
 msgstr "Lägg först i kön"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:735
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:737
 msgid "Description"
 msgstr "Beskrivning"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:736
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:738
 msgid "Channels"
 msgstr "Kanaler"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:737
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:739
 msgid "Content"
 msgstr "Innehåll"
 
-#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:738
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/konzilo.php:740
 msgid "Repeat entry"
 msgstr "Repetera inlägg"
+
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/includes/submitbox.inc:15
+msgid "Save"
+msgstr "Spara"
+
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/includes/submitbox.inc:32
+msgid "Preview Changes"
+msgstr "Förhandsgranska ändringar"
+
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/includes/submitbox.inc:46
+msgid "Preview"
+msgstr "Förhandsgranska"
+
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/includes/submitbox.inc:119
+msgid "Private"
+msgstr "Privat"
+
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/includes/submitbox.inc:122
+msgid "Password protected"
+msgstr "Lösenordsskyddad"
+
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/includes/submitbox.inc:125
+msgid "Public, Sticky"
+msgstr "Publik, klistrad"
+
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/includes/submitbox.inc:128
+msgid "Public"
+msgstr "Publik"
+
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/includes/submitbox.inc:160
+msgid "M j, Y @ H:i"
+msgstr "M j, Y @ H:i"
+
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/includes/submitbox.inc:163
+#, php-format
+msgid "Scheduled for: <b>%1$s</b>"
+msgstr "Schemalagd för: <b>%1$s</b>"
+
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/includes/submitbox.inc:165
+#, php-format
+msgid "Published on: <b>%1$s</b>"
+msgstr "Publicerad: <b>%1$s</b>"
+
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/includes/submitbox.inc:167
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/includes/submitbox.inc:175
+msgid "Publish <b>immediately</b>"
+msgstr "Publicera <b>direkt</b>"
+
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/includes/submitbox.inc:169
+#, php-format
+msgid "Schedule for: <b>%1$s</b>"
+msgstr "Schemalägg för: <b>%1$s</b>"
+
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/includes/submitbox.inc:171
+#, php-format
+msgid "Publish on: <b>%1$s</b>"
+msgstr "Publicera: <b>%1$s</b>"
+
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/includes/submitbox.inc:185
+#, php-format
+msgid "Your site is configured to keep only the last %s revisions."
+msgstr "Din site är konfigurerad att bara använda de sista %s revisionerna"
+
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/includes/submitbox.inc:187
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/includes/submitbox.inc:190
+#, php-format
+msgid "Revisions: %s"
+msgstr "Revisioner: %s"
+
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/includes/submitbox.inc:223
+msgid "Delete Permanently"
+msgstr "Ta bort permanent"
+
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/includes/submitbox.inc:225
+msgid "Move to Trash"
+msgstr "Flytta till papperskorgen"
+
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/includes/submitbox.inc:238
+msgid "Schedule"
+msgstr "Schemalägg"
+
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/includes/submitbox.inc:241
+msgid "Ready for publishing"
+msgstr "Redo för publicering"
+
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/includes/submitbox.inc:245
+msgid "Submit for Review"
+msgstr "Skicka till granskning"
+
+#: /home/fabsor/projects/konzilo-wp/web/app/plugins/konzilo/includes/submitbox.inc:270
+msgid "Publish"
+msgstr "Publicera"
 
 #~ msgid "+ 2 hours"
 #~ msgstr "+ 2 timmar"
