@@ -238,11 +238,11 @@ if ( !in_array( $post->post_status, array('publish', 'future', 'private') ) || 0
 		<?php submit_button( __( 'Schedule' ), 'primary button-large', 'publish', false ); ?>
 <?php	else : ?>
 		<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e('Publish') ?>" />
-		<?php submit_button( __( 'Ready for publishing' ), 'primary button-large', 'ready_for_publishing', false ); ?>
+		<?php submit_button( __( 'Ready for publishing', 'konzilo' ), 'primary button-large', 'ready_for_publishing', false ); ?>
 <?php	endif;
 	else : ?>
 		<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e('Submit for Review') ?>" />
-		<?php submit_button( __( 'Submit for Review' ), 'primary button-large', 'publish', false ); ?>
+		<?php submit_button( __( 'Submit for Review', 'konzilo' ), 'primary button-large', 'publish', false ); ?>
 <?php
 	endif;
 } else { ?>
