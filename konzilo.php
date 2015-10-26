@@ -333,7 +333,8 @@ function konzilo_save_update($post_id, $post ) {
   $update->link = get_permalink($post_id);
   if ($_POST['konzilo_type'] == 'date') {
       $default = date_default_timezone_get();
-      if (!empty(get_option('timezone_string'))) {
+      $timezone = get_option('timezone_string');
+      if (!empty($timezone))) {
           date_default_timezone_set(get_option('timezone_string'));
       }
 
@@ -582,7 +583,8 @@ function konzilo_submit_actions() {
 
       case 'date':
           $default = date_default_timezone_get();
-          if (!empty(get_option('timezone_string'))) {
+          $timezone = get_option('timezone_string');
+          if (!empty($timezone))) {
               date_default_timezone_set(get_option('timezone_string'));
           }
           $konzilo_status = __('Scheduled at:', 'konzilo') . ' ' .
