@@ -148,7 +148,7 @@
       if (e.data && e.data.type === 'editLoaded') {
         editLoaded = true;
       }
-      if (e.data && e.data.type === 'editLoaded') {
+      if (e.data && e.data.type === 'editUnloaded') {
         editLoaded = false;
       }
       if (e.data === 'saved') {
