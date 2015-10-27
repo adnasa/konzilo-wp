@@ -11,7 +11,7 @@
         return;
       }
       iframe[0].contentWindow.postMessage(msg, '*');
-    }
+    };
 
     var toggleQueue = function () {
       if ($('input[name=queue_items]').attr('checked')) {
@@ -142,7 +142,15 @@
       $('select[name=post_status]').val('done');
     });
     var sent = false;
+    var editLoaded = false;
+
     var listener = function (e) {
+      if (e.data && e.data.type === 'editLoaded') {
+        editLoaded = true;
+      }
+      if (e.data && e.data.type === 'editLoaded') {
+        editLoaded = false;
+      }
       if (e.data === 'saved') {
         sent = true;
         $('form#post').submit();
@@ -150,11 +158,12 @@
       if (e.data && e.data.type === 'height') {
         $('#konzilo-iframe').height(e.data.height + 40);
       }
-    }
+    };
+
     window.addEventListener('message', listener);
 
     $('form#post').submit(function(e) {
-      if (!sent) {
+      if (!sent && editLoaded) {
         e.preventDefault();
         sendMessage({
           type: 'saveUpdate'
