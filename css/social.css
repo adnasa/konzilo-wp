@@ -187,8 +187,10 @@ a.remove-box {
 }
 
 #konzilo-post-status {
+
     font-weight: 600;
 }
+
 
 #konzilo-status-select {
     line-height: 1.5em;
@@ -310,6 +312,10 @@ label[for=konzilo-status]:before {
 
 #konzilo-status-select #timestampdiv .timestamp-wrap label {
     margin-right: 5px;
+}
+
+.konzilo-post-choice {
+    margin-top: 10px;
 }
 
 #konzilo-status-select #timestampdiv .timestamp-wrap label:nth-child(3),
