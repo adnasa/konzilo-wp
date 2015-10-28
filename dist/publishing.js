@@ -163,7 +163,7 @@
     window.addEventListener('message', listener);
 
     $('form#post').submit(function(e) {
-      if (!sent && editLoaded) {
+      if (!sent && editLoaded && !$(this).attr('target')) {
         e.preventDefault();
         sendMessage({
           type: 'saveUpdate'
