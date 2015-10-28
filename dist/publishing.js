@@ -173,5 +173,60 @@
         sent = false;
       }
     });
+
+    var truncateStr = function (str) {
+      var trimmed = str.substr(0, 400);
+      return trimmed.substr(0, Math.min(trimmed.length, trimmed.lastIndexOf(" ")))
+    }
+
+    var sendPostInfo = function () {
+      // Find image
+      var img = $('#postimagediv img').attr('src');
+      var truncate = false;
+      if (!img) {
+        var image = $('#content').val().match(/<img.*?src="([^"]+)"/);
+        if (image && image.length > 0) {
+          img = image[1];
+        }
+      }
+      var description = $('#excerpt').val();
+      if (!description) {
+        var desc = $('#content').val().match(/(.*)<!--more-->/);
+
+        if (desc && desc.length > 0) {
+          description = desc[1];
+        }
+        else {
+          description = $('#content').val();
+          truncate = true;
+        }
+      }
+
+      // Strip all tags.
+      var div = document.createElement("div");
+      div.innerHTML = description;
+      description = div.textContent || div.innerText || "";
+
+      if (truncate) {
+        description = truncateStr(description);
+      }
+
+      var info = {
+        description: description,
+        title: $('#title').val(),
+        image: img,
+      };
+      sendMessage({
+        type: 'postInfo',
+        info: info
+      });
+    };
+
+    var trackChanges = function () {
+      sendPostInfo();
+      setTimeout(trackChanges, 300);
+    };
+    trackChanges();
   });
+
 }(jQuery, _));
