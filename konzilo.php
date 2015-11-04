@@ -319,7 +319,6 @@ function konzilo_save_update($post_id, $post ) {
   if (!empty($site)) {
       $update->site = $site;
   }
-  $old_type = $update->type;
   $update->type = $_POST['konzilo_type'];
   if (!empty($_POST['konzilo_queue'])
       && $update->type == 'queue_last' || $update->type == 'queue_first') {
@@ -559,17 +558,9 @@ function konzilo_submit_actions() {
     }
 
     if (empty($update)) {
-      $update = array();
-      if (!empty($queues)) {
-        $update['type'] = 'queue_last';
-        $queue = $queues[0];
-        $update['queue'] = $queue->id;
-        $konzilo_status = __('Last in', 'konzilo') . ' ' . $queue->name;
-      }
-      else {
-        $update['type'] = 'stored';
+        $update = new stdClass;
+        $update->type = 'stored';
         $konzilo_status = __('Parked', 'konzilo');
-      }
     }
     else {
       switch ($update->type) {
@@ -598,10 +589,12 @@ function konzilo_submit_actions() {
           $queue_map[$queue->id] = $queue;
         }
         if (empty($update->queue)) {
-          $update->queue = $queues[0]->id;
+            $konzilo_status = __('Parked', 'konzilo');
         }
-        $konzilo_status = __('In', 'konzilo') . ' ' .
-                        $queue_map[$update->queue]->name;
+        else {
+            $konzilo_status = __('In', 'konzilo') . ' ' .
+                            $queue_map[$update->queue]->name;
+        }
         break;
       }
     }
