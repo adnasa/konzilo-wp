@@ -662,7 +662,9 @@ function konzilo_post_status() {
     'label'                     => _x( 'done', 'Status General Name', 'konzilo' ),
     'label_count'               => _n_noop( 'done (%s)',  'done (%s)', 'konzilo' ),
     'public'                    => false,
+    'show_in_admin_all_list'    => true,
     'exclude_from_search'       => true,
+    'show_in_admin_all_list'    => true,
   );
   register_post_status( 'done', $args );
 
