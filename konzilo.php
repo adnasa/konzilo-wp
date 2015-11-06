@@ -296,19 +296,22 @@ function konzilo_meta_box_setup() {
 }
 
 function konzilo_save_update($post_id, $post ) {
-
   $post_type = get_post_type_object( $post->post_type );
   /* Check if the current user has permission to edit the post.*/
-  if ( !current_user_can( $post_type->cap->edit_post, $post_id ) || !isset($_POST['konzilo_type']))
+  if ( !current_user_can( $post_type->cap->edit_post, $post_id ))
     return $post_id;
   try {
     $update = konzilo_get_post_update($post->ID);
+
   }
   catch (Exception $e) {}
   if (empty($update)) {
       $update = new stdClass;
   }
-
+  if (empty($_POST['konzilo_type']) && empty($update->type)) {
+      return $post_id;
+  }
+  $type = !empty($_POST['konzilo_type']) ? $_POST['konzilo_type'] : $update->type;
   $update->title = strip_tags($post->post_title);
   $update->post_id = $post->ID;
   $organisation = get_option('konzilocustom_organisation');
@@ -319,18 +322,20 @@ function konzilo_save_update($post_id, $post ) {
   if (!empty($site)) {
       $update->site = $site;
   }
-  $update->type = $_POST['konzilo_type'];
+  $update->type = $type;
   if (!empty($_POST['konzilo_queue'])
       && $update->type == 'queue_last' || $update->type == 'queue_first') {
 
     $update->queue = $_POST['konzilo_queue'];
     // Lets get the defaults from the list.
-    unset($update->updates);
+    if (empty($update->id)) {
+        unset($update->updates);
+    }
   }
   $update->status = $_POST['post_status'];
 
   $update->link = get_permalink($post_id);
-  if ($_POST['konzilo_type'] == 'date') {
+  if ($type == 'date') {
       $default = date_default_timezone_get();
       $timezone = get_option('timezone_string');
       if (!empty($timezone)) {
