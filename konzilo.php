@@ -592,8 +592,18 @@ function konzilo_submit_actions() {
             $konzilo_status = __('Parked', 'konzilo');
         }
         else {
+            $default = date_default_timezone_get();
+            $timezone = get_option('timezone_string');
+            if (!empty($timezone)) {
+                date_default_timezone_set(get_option('timezone_string'));
+            }
             $konzilo_status = __('In', 'konzilo') . ' ' .
                             $queue_map[$update->queue]->name;
+            $date = $update->scheduled_at ? $update->scheduled_at : $update->queue_time;
+            if (!empty($date)) {
+                $konzilo_status .= ' (' . date('Y-m-d H:i', strtotime($date)) . ')';
+            }
+            date_default_timezone_set($default);
         }
         break;
       }

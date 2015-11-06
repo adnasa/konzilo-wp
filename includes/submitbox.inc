@@ -72,7 +72,7 @@ switch ( $post->post_status ) {
 		_e('Pending Review');
 		break;
 case 'done':
-    _e('Done');
+    _e('Scheduled');
     break;
 	case 'draft':
 	case 'auto-draft':
@@ -95,7 +95,7 @@ case 'done':
 <option<?php selected( $post->post_status, 'future' ); ?> value='future'><?php _e('Scheduled') ?></option>
 <?php endif; ?>
 <option<?php selected( $post->post_status, 'pending' ); ?> value='pending'><?php _e('Pending Review') ?></option>
-<option<?php selected( $post->post_status, 'done' ); ?> value='done'><?php _e('Done') ?></option>
+<option<?php selected( $post->post_status, 'done' ); ?> value='done'><?php _e('Scheduled') ?></option>
 
 <?php if ( 'auto-draft' == $post->post_status ) : ?>
 <option<?php selected( $post->post_status, 'auto-draft' ); ?> value='draft'><?php _e('Draft') ?></option>
