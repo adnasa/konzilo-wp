@@ -151,7 +151,8 @@
       if (e.data && e.data.type === 'editUnloaded') {
         editLoaded = false;
       }
-      if (e.data === 'saved') {
+      if (e.data.type === 'saved') {
+        $('#konzilo-update').val(JSON.stringify(e.data.message));
         sent = true;
         $('form#post').submit();
       }

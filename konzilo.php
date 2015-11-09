@@ -302,11 +302,17 @@ function konzilo_save_update($post_id, $post ) {
     return $post_id;
   try {
     $update = konzilo_get_post_update($post->ID);
-
   }
   catch (Exception $e) {}
   if (empty($update)) {
       $update = new stdClass;
+  }
+  if (!empty($_POST['konzilo_update'])) {
+      $update_info = json_decode(stripcslashes($_POST['konzilo_update']));
+      if (!empty($update_info)) {
+          $update->updates = $update_info->updates;
+          $update->text = !empty($update_info->text) ? $update_info->text : '[title]';
+      }
   }
   if (empty($_POST['konzilo_type']) && empty($update->type)) {
       return $post_id;
@@ -314,6 +320,7 @@ function konzilo_save_update($post_id, $post ) {
   $type = !empty($_POST['konzilo_type']) ? $_POST['konzilo_type'] : $update->type;
   $update->title = strip_tags($post->post_title);
   $update->post_id = $post->ID;
+  $update->type = $type;
   $organisation = get_option('konzilocustom_organisation');
   $site = get_option('konzilocustom_site');
   if (!empty($organisation)) {
@@ -322,15 +329,10 @@ function konzilo_save_update($post_id, $post ) {
   if (!empty($site)) {
       $update->site = $site;
   }
-  $update->type = $type;
   if (!empty($_POST['konzilo_queue'])
       && $update->type == 'queue_last' || $update->type == 'queue_first') {
 
     $update->queue = $_POST['konzilo_queue'];
-    // Lets get the defaults from the list.
-    if (empty($update->id)) {
-        unset($update->updates);
-    }
   }
   $update->status = $_POST['post_status'];
 
@@ -350,8 +352,10 @@ function konzilo_save_update($post_id, $post ) {
   }
   try {
       if (!empty($update->id)) {
+          konzilo_log($update->type);
           $result = konzilo_put_data('updates', $update->id, array(
               'body' => $update));
+          konzilo_log($result->type);
       }
       else {
           $result = konzilo_post_data('updates', array(
@@ -360,6 +364,7 @@ function konzilo_save_update($post_id, $post ) {
       }
   }
   catch (Exception $e) {
+      konzilo_log(print_r($e, TRUE));
       konzilo_log(__('Something went wrong when saving your post to konzilo.' .
                      ' Check your <a href="' .
                      admin_url('options-general.php?page=konzilo_auth_settings') .
@@ -417,7 +422,7 @@ function konzilo_add_meta_boxes() {
   global $post;
   try {
       $update = konzilo_get_post_update($post->ID);
-      if ($post->post_status != 'publish' && (!empty($update) && $update->type != 'now')) {
+      if ($post->post_status != 'publish') {
           add_meta_box(
           'konzilo-social-post',      // Unique ID
           esc_html__( 'Konzilo', 'konzilo' ),    // Title
@@ -466,13 +471,13 @@ function konzilo_meta_box( $object, $box ) {
     $update = konzilo_get_post_update($object->ID);
   }
   catch (Exception $e) {
-    return;
     // We need to deal with these things in some way.
   }
-
+  $link = empty($update) ? KONZILO_URL . '/cms-new' : KONZILO_URL . '/edit/' . $update->id;
   echo $twig->render('templates/social_form.html', array(
     'update' => $update,
-    'konzilo_url' => KONZILO_URL
+    'konzilo_url' => KONZILO_URL,
+    'link' => $link
   ));
 }
 
@@ -669,7 +674,7 @@ function konzilo_transition($new_status, $old_status, $post) {
     //...
   }
 }
-add_action('transition_post_status', 'konzilo_transition', 10, 3);
+//add_action('transition_post_status', 'konzilo_transition', 10, 3);
 
 
 function konzilo_post_status() {
