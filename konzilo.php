@@ -352,7 +352,6 @@ function konzilo_save_update($post_id, $post ) {
   }
   try {
       if (!empty($update->id)) {
-          konzilo_log($update->type);
           $result = konzilo_put_data('updates', $update->id, array(
               'body' => $update));
           konzilo_log($result->type);
