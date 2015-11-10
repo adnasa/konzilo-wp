@@ -264,7 +264,7 @@ function konzilo_add_submit_metabox() {
     if (!empty($post->ID)) {
         $update = konzilo_get_post_update($post->ID);
     }
-    if (empty($update) || (empty($update->sent) && $update->type != 'now'
+    if ((empty($update) && $post->post_status != 'future') || (!empty($update) && empty($update->sent) && $update->type != 'now'
                            && $post->post_status != 'publish')) {
         remove_meta_box('submitdiv', 'post', 'side');
         add_meta_box('submitdiv', __('Publish'), 'konzilo_submit_meta_box', 'post', 'side', 'high');

@@ -421,7 +421,7 @@ function konzilo_add_meta_boxes() {
   global $post;
   try {
       $update = konzilo_get_post_update($post->ID);
-      if ($post->post_status != 'publish') {
+      if ($post->post_status != 'publish' && (!empty($update) || $post->post_status != 'future')) {
           add_meta_box(
           'konzilo-social-post',      // Unique ID
           esc_html__( 'Konzilo', 'konzilo' ),    // Title
@@ -562,7 +562,7 @@ function konzilo_submit_actions() {
     $queues = konzilo_get_queues();
     $konzilo_id = get_post_meta($post->ID, 'konzilo_id', true);
     $update = konzilo_get_post_update($post->ID);
-    if ($post->post_status == 'publish' || (!empty($update) && (!empty($update->sent) || $update->type == 'now'))) {
+    if ($post->post_status == 'publish' || (empty($update) && $post->post_status == 'future') || (!empty($update) && (!empty($update->sent) || $update->type == 'now'))) {
         return;
     }
 
