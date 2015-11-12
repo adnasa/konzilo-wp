@@ -71,9 +71,9 @@ switch ( $post->post_status ) {
 	case 'pending':
 		_e('Pending Review');
 		break;
-case 'done':
-    _e('Scheduled');
-    break;
+    /*case 'done':
+      _e('Scheduled');
+      break;*/
 	case 'draft':
 	case 'auto-draft':
 		_e('Draft');
@@ -95,8 +95,6 @@ case 'done':
 <option<?php selected( $post->post_status, 'future' ); ?> value='future'><?php _e('Scheduled') ?></option>
 <?php endif; ?>
 <option<?php selected( $post->post_status, 'pending' ); ?> value='pending'><?php _e('Pending Review') ?></option>
-<option<?php selected( $post->post_status, 'done' ); ?> value='done'><?php _e('Scheduled') ?></option>
-
 <?php if ( 'auto-draft' == $post->post_status ) : ?>
 <option<?php selected( $post->post_status, 'auto-draft' ); ?> value='draft'><?php _e('Draft') ?></option>
 <?php else : ?>
@@ -266,8 +264,8 @@ function konzilo_add_submit_metabox() {
     }
     if ((empty($update) && $post->post_status != 'future') || (!empty($update) && empty($update->sent) && $update->type != 'now'
                            && $post->post_status != 'publish')) {
-        remove_meta_box('submitdiv', 'post', 'side');
-        add_meta_box('submitdiv', __('Publish'), 'konzilo_submit_meta_box', 'post', 'side', 'high');
+        //remove_meta_box('submitdiv', 'post', 'side');
+        //add_meta_box('submitdiv', __('Publish'), 'konzilo_submit_meta_box', 'post', 'side', 'high');
     }
   }
 }

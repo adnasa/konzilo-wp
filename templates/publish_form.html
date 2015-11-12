@@ -1,5 +1,5 @@
 <div class="misc-pub-section misc-pub-post-status">
-  <label for="konzilo-status">{{__('Publishing:')}}</label>
+  <label for="konzilo-status">{{__('Konzilo:')}}</label>
   <span id="konzilo-post-status">
     {{konzilo_status}}
   </span>
@@ -47,9 +47,6 @@
       <input type="radio" name="konzilo_type" value="date" {{checked(post, 'scheduled')}} />
       <span>{{__('Schedule')}}</span>
     </label>
-    <div id="timestampdiv" class="hide-if-js">
-      {{touch_time(action)}}
-    </div>
     <div class="konzilo-post-choice">
       <a href="#konzilo-post-status" class="save-konzilo-status hide-if-no-js button">{{'OK' | t}}</a>
       <a href="#konzilo-post-status" class="cancel-konzilo-status hide-if-no-js button-cancel">{{'Cancel' | t}}</a>

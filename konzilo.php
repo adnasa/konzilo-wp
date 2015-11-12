@@ -330,12 +330,10 @@ function konzilo_save_update($post_id, $post ) {
       $update->site = $site;
   }
   if (!empty($_POST['konzilo_queue'])
-      && $update->type == 'queue_last' || $update->type == 'queue_first') {
-
+      && ($update->type == 'queue_last' || $update->type == 'queue_first')) {
     $update->queue = $_POST['konzilo_queue'];
   }
   $update->status = $_POST['post_status'];
-
   $update->link = get_permalink($post_id);
   if ($type == 'date') {
       $default = date_default_timezone_get();
@@ -651,44 +649,6 @@ function konzilo_before_delete($post_id) {
   }
 }
 add_action('before_delete_post', 'konzilo_before_delete');
-
-
-function konzilo_transition($new_status, $old_status, $post) {
-  if ($new_status == $old_status) {
-    return;
-  }
-  $konzilo_id = get_post_meta($post->ID, 'konzilo_id', true);
-  if (empty($konzilo_id)) {
-    return;
-  }
-  try {
-    $data = konzilo_get_update($konzilo_id);
-    $data->status = $new_status;
-    if ($new_status == 'published') {
-      $data->type = 'now';
-    }
-    konzilo_put_data('updates', $konzilo_id, array('body' => $data));
-  }
-  catch(Exception $e) {
-    //...
-  }
-}
-//add_action('transition_post_status', 'konzilo_transition', 10, 3);
-
-
-function konzilo_post_status() {
-  $args = array(
-    'label'                     => _x( 'done', 'Status General Name', 'konzilo' ),
-    'label_count'               => _n_noop( 'done (%s)',  'done (%s)', 'konzilo' ),
-    'public'                    => false,
-    'show_in_admin_all_list'    => true,
-    'exclude_from_search'       => true,
-    'show_in_admin_all_list'    => true,
-  );
-  register_post_status( 'done', $args );
-
-}
-add_action( 'init', 'konzilo_post_status', 0 );
 
 function konzilo_queue_t() {
   return array(
