@@ -318,6 +318,9 @@ function konzilo_save_update($post_id, $post ) {
       return $post_id;
   }
   $type = !empty($_POST['konzilo_type']) ? $_POST['konzilo_type'] : $update->type;
+  if ($post->post_status == 'publish') {
+      $type = 'now';
+  }
   $update->title = strip_tags($post->post_title);
   $update->post_id = $post->ID;
   $update->type = $type;
@@ -334,6 +337,7 @@ function konzilo_save_update($post_id, $post ) {
     $update->queue = $_POST['konzilo_queue'];
   }
   $update->status = $_POST['post_status'];
+
   $update->link = get_permalink($post_id);
   if ($type == 'date') {
       $default = date_default_timezone_get();
@@ -379,7 +383,7 @@ function konzilo_log($error) {
 function konzilo_admin_notices() {
     $log = get_option('konzilo_log', array());
     foreach ($log as $message) {
-        echo '<div class="notice notice-error is-dismissable"><p>' . $message . '</p></div>';
+        echo '<div class="notice notice-error is-dismissable"><p>' . print_r($message, TRUE) . '</p></div>';
     }
     if (!empty($log)) {
         update_option('konzilo_log', array());
@@ -599,18 +603,8 @@ function konzilo_submit_actions() {
             $konzilo_status = __('Parked', 'konzilo');
         }
         else {
-            $default = date_default_timezone_get();
-            $timezone = get_option('timezone_string');
-            if (!empty($timezone)) {
-                date_default_timezone_set(get_option('timezone_string'));
-            }
             $konzilo_status = __('In', 'konzilo') . ' ' .
                             $queue_map[$update->queue]->name;
-            $date = $update->scheduled_at ? $update->scheduled_at : $update->queue_time;
-            if (!empty($date)) {
-                $konzilo_status .= ' (' . date('Y-m-d H:i', strtotime($date)) . ')';
-            }
-            date_default_timezone_set($default);
         }
         break;
       }
@@ -714,3 +708,12 @@ function konzilo_additional_t() {
     __('Repeat entry', 'konzilo')
   );
 }
+
+function konzilo_xmlrpc_insert($post_data) {
+    if (!empty($post_data['post_date_gmt'])) {
+        $post_data['edit_date'] = true;
+    }
+    return $post_data;
+}
+
+add_filter('xmlrpc_wp_insert_post_data', 'konzilo_xmlrpc_insert');
