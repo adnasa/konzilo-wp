@@ -71,7 +71,18 @@ function konzilo_has_client() {
   $client_id = $get('konzilo_client_id', '');
   $client_key = $get('konzilo_client_key', '');
   $token = $get('konzilo_access_token', '');
-  return $client_id && $client_key && $token;
+  $org = get_option('konzilo_organisation');
+  // Get info about the organisation if its not available.
+  if (empty($org)) {
+    try {
+      $site = konzilo_get_data('application-site');
+      update_option('konzilo_organisation', $site->organisation);
+    }
+    catch (Exception $e) {
+      return false;
+    }
+  }
+  return $client_id && $client_key && $token && $org;
 }
 
 /**
@@ -242,41 +253,8 @@ function konzilo_delete_data($resource, $id, $args = array()) {
   return konzilo_get_data($resource, $args, $id);
 }
 
-function konzilo_get_profiles() {
-  static $profiles = null;
-  if (empty($profiles)) {
-    $profiles = wp_cache_get('konzilo_profiles');
-    if (empty($profiles)) {
-      $profiles = konzilo_get_data('profiles');
-      wp_cache_set('konzilo_profiles', $profiles);
-    }
-  }
-  return $profiles;
-}
-
 function konzilo_get_update($id) {
   return konzilo_get_data('updates', array(), $id);
-}
-
-function konzilo_get_updates($post_id, $cache = true) {
-  static $updates = array();
-  if (empty($updates) && $cache) {
-    if ($cache) {
-      $updates = wp_cache_get('konzilo_updates_' . $post_id);
-    }
-    if (empty($updates)) {
-      $args = array('post_id' => $post_id);
-      if (is_multisite()) {
-        $args['site'] = get_option('konzilocustom_site');
-      }
-      else {
-        $args['application'] = true;
-      }
-      $updates = konzilo_get_data('updates', array(), null, $args);
-      wp_cache_set('konzilo_updates_' . $post_id, $updates);
-    }
-  }
-  return $updates;
 }
 
 add_action('load-post.php', 'konzilo_meta_box_setup');
@@ -286,7 +264,7 @@ function konzilo_meta_box_setup() {
   if (konzilo_has_client()) {
     try {
             wp_enqueue_style('social', plugins_url('css/social.css', __FILE__));
-            add_action('add_meta_boxes', 'konzilo_add_meta_boxes');
+            //add_action('add_meta_boxes', 'konzilo_add_meta_boxes');
             add_action('save_post', 'konzilo_save_update', 10, 2 );
     }
     catch(Exception $e) {
@@ -324,7 +302,7 @@ function konzilo_save_update($post_id, $post ) {
   $update->title = strip_tags($post->post_title);
   $update->post_id = $post->ID;
   $update->type = $type;
-  $organisation = get_option('konzilocustom_organisation');
+  $organisation = get_option('konzilo_organisation');
   $site = get_option('konzilocustom_site');
   if (!empty($organisation)) {
       $update->organisation = $organisation;
@@ -526,7 +504,12 @@ function konzilo_translate_codes($subject, $post) {
 }
 
 function konzilo_get_queues() {
-  return konzilo_get_data('queues');
+  return konzilo_get_data(
+    'queues',
+    array(),
+    NULL,
+    array('organisation' => get_option('konzilo_organisation'))
+  );
 }
 
 class KonziloTwigExtension extends Twig_Extension {
