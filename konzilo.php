@@ -276,7 +276,7 @@ function konzilo_meta_box_setup() {
 function konzilo_save_update($post_id, $post ) {
   $post_type = get_post_type_object( $post->post_type );
   /* Check if the current user has permission to edit the post.*/
-  if ( !current_user_can( $post_type->cap->edit_post, $post_id ))
+  if ($post->post_type != 'post' || !current_user_can( $post_type->cap->edit_post, $post_id ))
     return $post_id;
   try {
     $update = konzilo_get_post_update($post->ID);
@@ -331,7 +331,9 @@ function konzilo_save_update($post_id, $post ) {
       date_default_timezone_set($default);
   }
   try {
+
       if (!empty($update->id)) {
+
           $result = konzilo_put_data('updates', $update->id, array(
               'body' => $update));
 
