@@ -10,8 +10,24 @@ function konzilo_admin_menu() {
       'konzilo_auth_settings'
     );
   }
+
 }
 add_action ( 'admin_menu', 'konzilo_admin_menu', 999 );
+
+
+function konzilo_toolbar_items($admin_bar) {
+    $admin_bar->add_menu(array(
+        'id' => 'konzilo',
+        'title' => __('Go to Konzilo'),
+        'href' => KONZILO_URL
+    ));
+}
+
+add_action('admin_bar_menu', 'konzilo_toolbar_items', 100);
+
+function goto_konzilo() {
+    wp_redirect(KONZILO_URL);
+}
 
 function konzilo_settings_form() {
   register_setting('konzilo_auth_settings', 'konzilo_client_id');
